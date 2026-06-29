@@ -1,0 +1,66 @@
+import { motion } from 'framer-motion'
+import KikoCharacter from './KikoCharacter'
+
+// ──────────────────────────────────────────────────────────────────────────
+//  ResultPanel — shown after a lesson (and after the boss).
+//  Kiko reacts: happy on a pass, sad on a fail.
+// ──────────────────────────────────────────────────────────────────────────
+export default function ResultPanel({
+  pass,
+  correct,
+  total,
+  xpGained,
+  streak,
+  onContinue,
+  continueLabel = 'Back to map',
+}) {
+  return (
+    <motion.div
+      className="result-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        className={`result-panel ${pass ? 'is-pass' : 'is-fail'}`}
+        initial={{ scale: 0.7, y: 40, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+      >
+        <KikoCharacter state={pass ? 'happy' : 'sad'} size={150} shadow={false} />
+
+        <h2 className="result-panel__title">{pass ? 'Lesson Cleared!' : 'Not Quite…'}</h2>
+        <p className="result-panel__sub">
+          {pass
+            ? 'Kiko learned new kana and grew stronger!'
+            : 'The kana slipped away. Give it another try!'}
+        </p>
+
+        <div className="result-panel__stats">
+          <div className="result-stat">
+            <span className="result-stat__value">
+              {correct}/{total}
+            </span>
+            <span className="result-stat__label">Correct</span>
+          </div>
+          <div className="result-stat">
+            <span className="result-stat__value">+{xpGained}</span>
+            <span className="result-stat__label">XP</span>
+          </div>
+          <div className="result-stat">
+            <span className="result-stat__value">{streak} 🔥</span>
+            <span className="result-stat__label">Streak</span>
+          </div>
+        </div>
+
+        <motion.button
+          className="btn btn--primary"
+          onClick={onContinue}
+          whileTap={{ scale: 0.95 }}
+        >
+          {continueLabel}
+        </motion.button>
+      </motion.div>
+    </motion.div>
+  )
+}

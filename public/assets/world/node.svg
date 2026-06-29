@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Map node platform · fallback · transparent bg -->
+  <ellipse cx="60" cy="74" rx="46" ry="34" fill="#2f7d52"/>
+  <ellipse cx="60" cy="68" rx="46" ry="34" fill="#3f9d68"/>
+  <ellipse cx="60" cy="64" rx="40" ry="28" fill="#5bbd84"/>
+  <ellipse cx="60" cy="60" rx="34" ry="22" fill="#7fd1a6"/>
+  <!-- glowing rim -->
+  <ellipse cx="60" cy="60" rx="34" ry="22" fill="none" stroke="#ffe9a8" stroke-width="3" opacity="0.85"/>
+  <!-- moss spots -->
+  <circle cx="44" cy="58" r="4" fill="#9be0b8"/>
+  <circle cx="76" cy="64" r="3" fill="#9be0b8"/>
+  <circle cx="62" cy="52" r="2.5" fill="#c9f3da"/>
+</svg>
