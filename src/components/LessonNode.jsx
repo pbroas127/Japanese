@@ -15,6 +15,11 @@ export default function LessonNode({ node, status, title, onSelect }) {
   const fallback = NODE_FALLBACK[node.marker] || NODE_FALLBACK.book
   const src = status === 'locked' ? set.locked : set.unlocked
 
+  // Edge-aware info panel: flip above when the node sits low, and bias
+  // horizontally so it never clips off the left/right edge of the scene.
+  const vPlace = node.pos.y > 58 ? 'above' : 'below'
+  const hAlign = node.pos.x < 26 ? 'left' : node.pos.x > 74 ? 'right' : 'center'
+
   return (
     <div
       className={`node node--${status} node--${node.marker} ${isBoss ? 'node--boss' : ''}`}
@@ -57,7 +62,7 @@ export default function LessonNode({ node, status, title, onSelect }) {
 
       {status === 'current' && (
         <motion.div
-          className="node__info"
+          className={`node__info node__info--${vPlace} node__info--${hAlign}`}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}

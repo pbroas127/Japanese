@@ -112,7 +112,10 @@ img { -webkit-user-drag: none; }
 .bottomnav__dot { position: absolute; top: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
 
 /* ── World map ─────────────────────────────────────────────────────────── */
-.worldmap { position: absolute; inset: 0; overflow: hidden; }
+/* The scene is locked to the background art's aspect ratio so node % positions
+   land on the painted dirt path on every device. */
+.worldmap { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; background: #143d2b; -webkit-overflow-scrolling: touch; }
+.worldmap__scene { position: relative; width: 100%; margin: 0 auto; }
 .worldmap__bg-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .worldmap__vignette { position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(180deg, rgba(255,246,230,0.12) 0%, rgba(0,0,0,0) 22%, rgba(14,42,29,0.28) 100%); }

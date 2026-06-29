@@ -106,20 +106,30 @@ export const LESSONS = [
   },
 ]
 
-// World structure: ordered nodes laid out on the map (positions are % of the
-// map). Each node has a `marker` describing the kind of place it is, so the
-// player understands its function before tapping. `kiko` is a nearby clearing
-// (a rock / stump / campsite) where Kiko stands beside — never on — the node.
+// World structure: ordered nodes laid out on the map. Positions are % of the
+// world scene, which is locked to the background art's aspect ratio so the
+// markers land on the painted dirt-path clearings on every device. Each node
+// has a `marker` describing the kind of place it is, so the player understands
+// its function before tapping.
+//
+// NOTE: these coordinates are tuned to the painted path in the current forest
+// background. If the background art changes, re-tune them here.
 export const WORLD = {
   id: 'forest',
   name: 'Forest of Hiragana',
+  // Aspect ratio of the background art (width / height) — the scene is locked
+  // to this so node % positions map straight onto the painted path.
+  art: { w: 1536, h: 2752 },
+  // Kiko's permanent home: a dirt clearing off the path. She never moves from
+  // here; only her pose/expression changes with the player's progress.
+  kikoHome: { x: 25, y: 85 },
   nodes: [
-    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 24, y: 84 }, kiko: { x: 50, y: 88 } },
-    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 52, y: 70 }, kiko: { x: 26, y: 72 } },
-    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 28, y: 56 }, kiko: { x: 54, y: 56 } },
-    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 56, y: 42 }, kiko: { x: 30, y: 40 } },
-    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 34, y: 28 }, kiko: { x: 60, y: 26 } },
-    { id: 'boss', type: 'boss', lessonId: null, label: '★', marker: 'torii', place: "Guardian's Gate", pos: { x: 60, y: 13 }, kiko: { x: 32, y: 14 } },
+    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 60, y: 85 } },
+    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 80, y: 71 } },
+    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 19, y: 70 } },
+    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 47, y: 57 } },
+    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 73, y: 41 } },
+    { id: 'boss', type: 'boss', lessonId: null, label: '★', marker: 'torii', place: "Guardian's Gate", pos: { x: 55, y: 16 } },
   ],
 }
 
