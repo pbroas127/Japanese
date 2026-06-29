@@ -5,6 +5,7 @@ import { WORLD_ASSETS, WORLD_FALLBACK } from '../assets/assetMap'
 import LessonNode from './LessonNode'
 import KikoCharacter from './KikoCharacter'
 import DialogueBubble from './DialogueBubble'
+import { smoothPath } from '../utils/path'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  WorldMap — the Forest of Hiragana hub.
@@ -48,6 +49,20 @@ export default function WorldMap({ getStatus, onSelectNode, worldComplete, strea
           }}
         />
         <div className="worldmap__vignette" />
+
+        {WORLD.path.length >= 2 && (
+          <svg className="worldmap__trail" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path
+              d={smoothPath(WORLD.path)}
+              fill="none"
+              stroke="rgba(255,255,255,0.7)"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeDasharray="0.1 4.5"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        )}
 
         {nodes.map((node) => (
           <LessonNode

@@ -122,7 +122,10 @@ export const WORLD = {
   art: { w: 1536, h: 2752 },
   // Kiko's permanent home: a dirt clearing off the path. She never moves from
   // here; only her pose/expression changes with the player's progress.
-  kikoHome: { x: 25, y: 85 },
+  kikoHome: { x: 12, y: 88 },
+  // Optional hand-tuned dotted trail (waypoints in % of the scene). Empty = no
+  // overlay trail (the painted path guides). Filled in from the layout editor.
+  path: [],
   nodes: [
     { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 60, y: 85 } },
     { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 80, y: 71 } },
