@@ -1,61 +1,72 @@
 import { motion } from 'framer-motion'
-import { WORLD_ASSETS, WORLD_FALLBACK } from '../assets/assetMap'
+import { NODE_ASSETS, NODE_FALLBACK } from '../assets/assetMap'
 
 // ──────────────────────────────────────────────────────────────────────────
-//  LessonNode — a single map marker.
-//  States: locked (dim + 🔒), current (glowing pulse + label), completed (✅).
-//  Boss nodes are larger and tinted. Kiko never stands on a node.
+//  LessonNode — a themed place embedded in the world (book / study / scroll /
+//  lantern / altar / torii). The marker itself communicates the node's
+//  function. Locked nodes use a distinct "sealed" asset (not a lock overlay);
+//  completed nodes get a wooden ✅ badge; the current node glows, pulses and
+//  shows a small info panel.
 // ──────────────────────────────────────────────────────────────────────────
-export default function LessonNode({ node, status, onSelect }) {
+export default function LessonNode({ node, status, title, onSelect }) {
   const isBoss = node.type === 'boss'
   const clickable = status === 'current'
+  const set = NODE_ASSETS[node.marker] || NODE_ASSETS.book
+  const fallback = NODE_FALLBACK[node.marker] || NODE_FALLBACK.book
+  const src = status === 'locked' ? set.locked : set.unlocked
 
   return (
-    <button
-      className={`node node--${status} ${isBoss ? 'node--boss' : ''}`}
+    <div
+      className={`node node--${status} node--${node.marker} ${isBoss ? 'node--boss' : ''}`}
       style={{ left: `${node.pos.x}%`, top: `${node.pos.y}%` }}
-      onClick={() => clickable && onSelect(node)}
-      disabled={!clickable}
-      aria-label={`${isBoss ? 'Boss' : 'Lesson'} ${node.label} — ${status}`}
     >
-      {/* pulsing ring on the active node */}
       {status === 'current' && (
         <motion.span
-          className="node__ring"
-          animate={{ scale: [1, 1.35, 1], opacity: [0.7, 0, 0.7] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="node__glow"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.55, 0, 0.55] }}
+          transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
 
-      <motion.span
-        className="node__disc"
-        animate={
-          status === 'current'
-            ? { y: [0, -5, 0] }
-            : { y: 0 }
-        }
-        transition={{ duration: 1.6, repeat: status === 'current' ? Infinity : 0, ease: 'easeInOut' }}
+      <motion.button
+        className="node__marker"
+        onClick={() => clickable && onSelect(node)}
+        disabled={!clickable}
+        aria-label={`${node.place} — ${status}`}
+        animate={status === 'current' ? { y: [0, -6, 0] } : { y: 0 }}
+        transition={{ duration: 1.7, repeat: status === 'current' ? Infinity : 0, ease: 'easeInOut' }}
         whileTap={clickable ? { scale: 0.9 } : {}}
+        whileHover={clickable ? { scale: 1.06 } : {}}
       >
         <img
-          src={WORLD_ASSETS.node}
+          src={src}
           alt=""
           className="node__img"
           draggable={false}
           onError={(e) => {
             if (!e.currentTarget.dataset.fb) {
               e.currentTarget.dataset.fb = '1'
-              e.currentTarget.src = WORLD_FALLBACK.node
+              e.currentTarget.src = fallback
             }
           }}
         />
-        <span className="node__face">
-          {status === 'completed' ? '✅' : isBoss ? '👹' : node.label}
-        </span>
-        {status === 'locked' && <span className="node__lock">🔒</span>}
-      </motion.span>
+        {status === 'completed' && <span className="node__check">✅</span>}
+      </motion.button>
 
-      {isBoss && status !== 'locked' && <span className="node__boss-label">BOSS</span>}
-    </button>
+      {isBoss && status !== 'locked' && <span className="node__boss-tag">BOSS</span>}
+
+      {status === 'current' && (
+        <motion.div
+          className="node__info"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <span className="node__info-place">{node.place}</span>
+          <span className="node__info-title">{title}</span>
+          <span className="node__info-cta">Tap to {isBoss ? 'challenge' : 'start'} →</span>
+        </motion.div>
+      )}
+    </div>
   )
 }

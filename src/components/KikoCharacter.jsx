@@ -47,6 +47,29 @@ const VARIANTS = {
     rotate: [0, -7, 7, 0],
     transition: { duration: 0.7, ease: 'easeInOut' },
   },
+  // ambient/contextual map poses (loop gently)
+  studying: {
+    y: [0, -3, 0],
+    rotate: [0, -1.5, 1.5, 0],
+    transition: { duration: 3.2, repeat: Infinity, ease: 'easeInOut' },
+  },
+  bossPrep: {
+    y: [0, -5, 0],
+    scale: [1, 1.03, 1],
+    transition: { duration: 1.1, repeat: Infinity, ease: 'easeInOut' },
+  },
+  // one-shot celebratory / movement poses
+  jumping: {
+    y: [0, -34, 0],
+    scaleY: [1, 1.06, 1],
+    transition: { duration: 0.7, ease: 'easeOut' },
+  },
+  victory: {
+    y: [0, -18, 0, -10, 0],
+    rotate: [0, -6, 6, 0],
+    scale: [1, 1.07, 1],
+    transition: { duration: 1.0, repeat: 1, ease: 'easeOut' },
+  },
 }
 
 export default function KikoCharacter({

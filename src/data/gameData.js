@@ -106,17 +106,20 @@ export const LESSONS = [
   },
 ]
 
-// World structure: ordered nodes laid out on the map (positions are % of the map).
+// World structure: ordered nodes laid out on the map (positions are % of the
+// map). Each node has a `marker` describing the kind of place it is, so the
+// player understands its function before tapping. `kiko` is a nearby clearing
+// (a rock / stump / campsite) where Kiko stands beside — never on — the node.
 export const WORLD = {
   id: 'forest',
   name: 'Forest of Hiragana',
   nodes: [
-    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', pos: { x: 22, y: 82 } },
-    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', pos: { x: 50, y: 70 } },
-    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', pos: { x: 28, y: 55 } },
-    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', pos: { x: 56, y: 41 } },
-    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', pos: { x: 34, y: 27 } },
-    { id: 'boss', type: 'boss', lessonId: null, label: '★', pos: { x: 64, y: 13 } },
+    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 24, y: 84 }, kiko: { x: 50, y: 88 } },
+    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 52, y: 70 }, kiko: { x: 26, y: 72 } },
+    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 28, y: 56 }, kiko: { x: 54, y: 56 } },
+    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 56, y: 42 }, kiko: { x: 30, y: 40 } },
+    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 34, y: 28 }, kiko: { x: 60, y: 26 } },
+    { id: 'boss', type: 'boss', lessonId: null, label: '★', marker: 'torii', place: "Guardian's Gate", pos: { x: 60, y: 13 }, kiko: { x: 32, y: 14 } },
   ],
 }
 
@@ -135,6 +138,31 @@ export const XP_PER_CORRECT = 10
 export const XP_LESSON_CLEAR = 50
 export const XP_BOSS_CLEAR = 250
 export const XP_PER_LEVEL = 200
+
+// Currency — Sakura Petals 🌸
+export const CURRENCY = { name: 'Sakura Petals', icon: '🌸' }
+export const PETALS_PER_CORRECT = 2
+export const PETALS_LESSON_CLEAR = 15
+export const PETALS_BOSS_CLEAR = 100
+
+// Streak milestones drive Kiko's reaction + bonus petals.
+export const STREAK_MILESTONES = [
+  { at: 3, tier: 'excited', label: 'On a roll!', bonus: 10 },
+  { at: 7, tier: 'glow', label: 'Glowing streak!', bonus: 25 },
+  { at: 30, tier: 'legend', label: 'Forest Legend!', bonus: 100 },
+]
+
+// The highest milestone reached at a given streak value (for HUD/Kiko glow).
+export function streakTier(streak) {
+  let tier = 'normal'
+  for (const m of STREAK_MILESTONES) if (streak >= m.at) tier = m.tier
+  return tier
+}
+
+// The milestone crossed when going from `prev` to `next` streak, if any.
+export function crossedMilestone(prev, next) {
+  return STREAK_MILESTONES.find((m) => prev < m.at && next >= m.at) || null
+}
 
 // ── Quiz builders ─────────────────────────────────────────────────────────
 
@@ -171,6 +199,17 @@ export function buildBossQuestions(count = 8) {
   return picked.map(makeQuestion)
 }
 
+// Build a free-practice set. Draws from the player's mastered kana (by char);
+// falls back to the first lesson when nothing is mastered yet.
+export function buildPracticeQuestions(masteredChars = [], count = 10) {
+  const all = LESSONS.flatMap((l) => l.kana)
+  let pool = all.filter((k) => masteredChars.includes(k.char))
+  if (pool.length === 0) pool = LESSONS[0].kana
+  const out = []
+  for (let i = 0; i < count; i++) out.push(makeQuestion(pool[i % pool.length]))
+  return shuffle(out)
+}
+
 // Lookup helpers.
 export function getLesson(lessonId) {
   return LESSONS.find((l) => l.id === lessonId) || null
@@ -182,4 +221,18 @@ export function levelFromXp(xp) {
 
 export function xpIntoLevel(xp) {
   return xp % XP_PER_LEVEL
+}
+
+// Total kana taught across the forest (for "kana mastered" stats).
+export const TOTAL_KANA = LESSONS.reduce((n, l) => n + l.kana.length, 0)
+
+// Contextual guide line for Kiko based on the current node + progress.
+export function getKikoLine({ currentNode, completedCount, justCleared, milestone }) {
+  if (milestone) return `${milestone.label} 🔥 +${milestone.bonus} petals!`
+  if (justCleared) return 'Nice work! Ready for the next one?'
+  if (!currentNode) return 'The whole forest is cleared. You did it! 🌳'
+  if (currentNode.type === 'boss') return "The Guardian's gate is just ahead — ready?"
+  if (completedCount === 0) return "Welcome! Let's learn our first kana together."
+  if (completedCount === WORLD.nodes.length - 2) return 'Only one lesson until the boss!'
+  return `Let's study at the ${currentNode.place}!`
 }

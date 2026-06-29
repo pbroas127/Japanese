@@ -5,13 +5,13 @@ import { useTransientState } from '../state/useTransientState'
 import KikoCharacter from './KikoCharacter'
 import QuizCard from './QuizCard'
 import ResultPanel from './ResultPanel'
-import ProgressHUD from './ProgressHUD'
+import TopHUD from './TopHUD'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  LessonScreen — intro (kana + examples) → quiz → result.
 //  Pass = score ≥ PASS_THRESHOLD → unlock + XP + streak. Fail = streak reset.
 // ──────────────────────────────────────────────────────────────────────────
-export default function LessonScreen({ node, lesson, xp, streak, onPass, onFail, onExit }) {
+export default function LessonScreen({ node, lesson, xp, streak, petals, onPass, onFail, onExit }) {
   const quiz = useMemo(() => buildQuiz(lesson), [lesson])
   const total = quiz.length
 
@@ -28,7 +28,7 @@ export default function LessonScreen({ node, lesson, xp, streak, onPass, onFail,
   const finish = (finalCorrect) => {
     const pass = finalCorrect / total >= PASS_THRESHOLD
     if (pass) onPass(node, finalCorrect, total)
-    else onFail(node)
+    else onFail(node, finalCorrect, total)
     setResult({
       pass,
       correct: finalCorrect,
@@ -61,7 +61,7 @@ export default function LessonScreen({ node, lesson, xp, streak, onPass, onFail,
 
   return (
     <div className="screen lesson" style={{ '--accent': lesson.accent }}>
-      <ProgressHUD xp={xp} streak={streak} />
+      <TopHUD xp={xp} streak={streak} petals={petals} compact />
 
       <button className="lesson__back" onClick={onExit} aria-label="Back to map">
         ‹ Map

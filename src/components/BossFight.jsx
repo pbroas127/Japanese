@@ -5,7 +5,7 @@ import { useTransientState } from '../state/useTransientState'
 import KikoCharacter from './KikoCharacter'
 import BossCharacter from './BossCharacter'
 import QuizCard from './QuizCard'
-import ProgressHUD from './ProgressHUD'
+import TopHUD from './TopHUD'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  BossFight — the Hiragana Guardian.
@@ -13,7 +13,7 @@ import ProgressHUD from './ProgressHUD'
 //  Kiko is hurt + loses HP. Win at boss 0 HP, lose at Kiko 0 HP. Animations
 //  are synced to each hit and always settle back to idle.
 // ──────────────────────────────────────────────────────────────────────────
-export default function BossFight({ node, xp, streak, onWin, onLose, onExit }) {
+export default function BossFight({ node, xp, streak, petals, onWin, onLose, onExit }) {
   const questions = useMemo(() => buildBossQuestions(12), [])
 
   const [bossHp, setBossHp] = useState(BOSS.maxHp)
@@ -67,7 +67,7 @@ export default function BossFight({ node, xp, streak, onWin, onLose, onExit }) {
 
   return (
     <div className="screen boss">
-      <ProgressHUD xp={xp} streak={streak} />
+      <TopHUD xp={xp} streak={streak} petals={petals} compact />
 
       <button className="lesson__back" onClick={onExit} aria-label="Flee to map">
         ‹ Flee
@@ -111,10 +111,10 @@ export default function BossFight({ node, xp, streak, onWin, onLose, onExit }) {
             >
               {phase === 'win' ? (
                 <>
-                  <KikoCharacter state="excited" size={150} shadow={false} />
+                  <KikoCharacter state="victory" size={150} shadow={false} />
                   <h2 className="result-panel__title">Guardian Calmed!</h2>
                   <p className="result-panel__sub">
-                    You cleared the Forest of Hiragana. Kiko earned +{250} XP!
+                    You cleared the Forest of Hiragana! +250 XP and a shower of 🌸.
                   </p>
                   <motion.button className="btn btn--primary" onClick={onExit} whileTap={{ scale: 0.95 }}>
                     Finish World 🌳

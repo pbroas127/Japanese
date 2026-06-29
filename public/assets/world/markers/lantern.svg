@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <ellipse cx="60" cy="84" rx="42" ry="22" fill="#3f9d68"/>
+  <ellipse cx="60" cy="80" rx="42" ry="22" fill="#5bbd84"/>
+  <ellipse cx="60" cy="78" rx="34" ry="16" fill="#7fd1a6"/>
+  <text x="60" y="58" font-size="46" text-anchor="middle" dominant-baseline="middle">🏮</text>
+</svg>
