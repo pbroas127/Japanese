@@ -122,17 +122,37 @@ export const WORLD = {
   art: { w: 1536, h: 2752 },
   // Kiko's permanent home: a dirt clearing off the path. She never moves from
   // here; only her pose/expression changes with the player's progress.
-  kikoHome: { x: 12, y: 88 },
-  // Optional hand-tuned dotted trail (waypoints in % of the scene). Empty = no
-  // overlay trail (the painted path guides). Filled in from the layout editor.
-  path: [],
+  // (Placed via the in-app layout editor.)
+  kikoHome: { x: 14.6, y: 85.6 },
+  // Hand-tuned dotted trail (waypoints in % of the scene) tracing the painted
+  // dirt path. Authored in the in-app layout editor.
+  path: [
+    { x: 50, y: 86.1 },
+    { x: 72.6, y: 84.7 },
+    { x: 79.3, y: 79.3 },
+    { x: 73.8, y: 72.7 },
+    { x: 76.7, y: 65.6 },
+    { x: 67.7, y: 71.4 },
+    { x: 48.8, y: 68.8 },
+    { x: 23.5, y: 67.1 },
+    { x: 17.2, y: 54.2 },
+    { x: 40, y: 50.9 },
+    { x: 50.7, y: 51.6 },
+    { x: 71.5, y: 51.5 },
+    { x: 78, y: 45.8 },
+    { x: 74, y: 35.7 },
+    { x: 75.4, y: 23.8 },
+    { x: 48.6, y: 23.8 },
+    { x: 29.5, y: 26.6 },
+    { x: 22.9, y: 35 },
+  ],
   nodes: [
-    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 60, y: 85 } },
-    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 80, y: 71 } },
-    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 19, y: 70 } },
-    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 47, y: 57 } },
-    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 73, y: 41 } },
-    { id: 'boss', type: 'boss', lessonId: null, label: '★', marker: 'torii', place: "Guardian's Gate", pos: { x: 55, y: 16 } },
+    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 51.2, y: 87.2 } },
+    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 77.1, y: 66.6 } },
+    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 24.3, y: 67.6 } },
+    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 50.2, y: 52 } },
+    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 75.5, y: 24.7 } },
+    { id: 'boss', type: 'boss', lessonId: null, label: '★', marker: 'torii', place: "Guardian's Gate", pos: { x: 23.2, y: 33.7 } },
   ],
 }
 
