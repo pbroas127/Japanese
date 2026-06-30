@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { review } from '../utils/srs'
 import {
-  WORLD,
+  WORLDS,
+  TOTAL_NODES,
+  getWorldOf,
+  worldUnlocked,
+  worldBossId,
   getLesson,
   crossedMilestone,
   levelFromXp,
@@ -19,7 +23,7 @@ import {
 } from '../data/gameData'
 
 const STORAGE_KEY = 'forest-of-hiragana:v2'
-const NODE_ORDER = WORLD.nodes.map((n) => n.id)
+const LAST_BOSS_ID = worldBossId(WORLDS[WORLDS.length - 1])
 
 const DEFAULT_STATE = {
   xp: 0,
@@ -61,8 +65,13 @@ function loadInitial() {
 }
 
 export function getNodeStatus(nodeId, completed) {
+  const world = getWorldOf(nodeId)
+  if (!world) return 'locked'
+  // Whole world is sealed until the previous world's boss is cleared.
+  if (!worldUnlocked(world.id, completed)) return 'locked'
   if (completed.includes(nodeId)) return 'completed'
-  const firstIncomplete = NODE_ORDER.find((id) => !completed.includes(id))
+  const order = world.nodes.map((n) => n.id)
+  const firstIncomplete = order.find((id) => !completed.includes(id))
   return nodeId === firstIncomplete ? 'current' : 'locked'
 }
 
@@ -261,12 +270,12 @@ export function useGameState() {
     return {
       level: levelFromXp(state.xp),
       vocabUnlocked: vocabUnlockedFor(levelFromXp(state.xp)),
-      worldComplete: state.completed.includes('boss'),
+      worldComplete: state.completed.includes(LAST_BOSS_ID),
       streakActiveToday: state.lastActive === todayStr(),
       accuracy: stats.totalQuestions ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0,
       kanaMastered: stats.kana.length,
       totalKana: TOTAL_KANA,
-      completionPct: Math.round((state.completed.length / WORLD.nodes.length) * 100),
+      completionPct: Math.round((state.completed.length / TOTAL_NODES) * 100),
     }
   }, [state])
 

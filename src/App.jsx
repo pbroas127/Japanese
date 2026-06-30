@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion'
-import { WORLD, getLesson } from './data/gameData'
+import { getNode, getLesson } from './data/gameData'
 import { useGameState } from './state/useGameState'
 import TopHUD from './components/TopHUD'
 import BottomNav from './components/BottomNav'
@@ -28,7 +28,7 @@ export default function App() {
   const openNode = (node) => setOverlay({ type: node.type === 'boss' ? 'boss' : 'lesson', nodeId: node.id })
   const closeOverlay = () => setOverlay(null)
 
-  const overlayNode = overlay ? WORLD.nodes.find((n) => n.id === overlay.nodeId) : null
+  const overlayNode = overlay ? getNode(overlay.nodeId) : null
   const overlayLesson = overlayNode?.lessonId ? getLesson(overlayNode.lessonId) : null
 
   return (

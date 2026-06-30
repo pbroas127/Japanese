@@ -12,6 +12,11 @@ export const ROMAJI_POOL = [
   'sa', 'shi', 'su', 'se', 'so',
   'ta', 'chi', 'tsu', 'te', 'to',
   'na', 'ni', 'nu', 'ne', 'no',
+  'ha', 'hi', 'fu', 'he', 'ho',
+  'ma', 'mi', 'mu', 'me', 'mo',
+  'ya', 'yu', 'yo',
+  'ra', 'ri', 'ru', 're', 'ro',
+  'wa', 'wo', 'n',
 ]
 
 // The five lessons of the Forest. Content is cumulative.
@@ -116,6 +121,102 @@ export const LESSONS = [
       { kana: 'ねこ', romaji: 'neko', meaning: 'cat' },
     ],
   },
+  {
+    id: 'l6',
+    title: 'The H Hill',
+    subtitle: 'は ひ ふ へ ほ',
+    accent: '#E8557A',
+    kana: [
+      { char: 'は', romaji: 'ha' },
+      { char: 'ひ', romaji: 'hi' },
+      { char: 'ふ', romaji: 'fu' },
+      { char: 'へ', romaji: 'he' },
+      { char: 'ほ', romaji: 'ho' },
+    ],
+    examples: [
+      { kana: 'はい', romaji: 'hai', meaning: 'yes' },
+      { kana: 'はな', romaji: 'hana', meaning: 'flower / nose' },
+      { kana: 'ふく', romaji: 'fuku', meaning: 'clothes' },
+      { kana: 'ほし', romaji: 'hoshi', meaning: 'star' },
+      { kana: 'はこ', romaji: 'hako', meaning: 'box' },
+    ],
+  },
+  {
+    id: 'l7',
+    title: 'The M Marsh',
+    subtitle: 'ま み む め も',
+    accent: '#4F9BD0',
+    kana: [
+      { char: 'ま', romaji: 'ma' },
+      { char: 'み', romaji: 'mi' },
+      { char: 'む', romaji: 'mu' },
+      { char: 'め', romaji: 'me' },
+      { char: 'も', romaji: 'mo' },
+    ],
+    examples: [
+      { kana: 'なまえ', romaji: 'namae', meaning: 'name' },
+      { kana: 'みせ', romaji: 'mise', meaning: 'store' },
+      { kana: 'まち', romaji: 'machi', meaning: 'town' },
+      { kana: 'め', romaji: 'me', meaning: 'eye' },
+      { kana: 'みみ', romaji: 'mimi', meaning: 'ear' },
+    ],
+  },
+  {
+    id: 'l8',
+    title: 'The Y Valley',
+    subtitle: 'や ゆ よ',
+    accent: '#5FBF7A',
+    kana: [
+      { char: 'や', romaji: 'ya' },
+      { char: 'ゆ', romaji: 'yu' },
+      { char: 'よ', romaji: 'yo' },
+    ],
+    examples: [
+      { kana: 'よむ', romaji: 'yomu', meaning: 'to read' },
+      { kana: 'やま', romaji: 'yama', meaning: 'mountain' },
+      { kana: 'ゆき', romaji: 'yuki', meaning: 'snow' },
+      { kana: 'やすい', romaji: 'yasui', meaning: 'cheap' },
+      { kana: 'ゆめ', romaji: 'yume', meaning: 'dream' },
+    ],
+  },
+  {
+    id: 'l9',
+    title: 'The R River',
+    subtitle: 'ら り る れ ろ',
+    accent: '#9B7BD4',
+    kana: [
+      { char: 'ら', romaji: 'ra' },
+      { char: 'り', romaji: 'ri' },
+      { char: 'る', romaji: 'ru' },
+      { char: 'れ', romaji: 're' },
+      { char: 'ろ', romaji: 'ro' },
+    ],
+    examples: [
+      { kana: 'する', romaji: 'suru', meaning: 'to do' },
+      { kana: 'みる', romaji: 'miru', meaning: 'to see' },
+      { kana: 'これ', romaji: 'kore', meaning: 'this' },
+      { kana: 'それ', romaji: 'sore', meaning: 'that' },
+      { kana: 'くる', romaji: 'kuru', meaning: 'to come' },
+    ],
+  },
+  {
+    id: 'l10',
+    title: 'The W Woods',
+    subtitle: 'わ を ん',
+    accent: '#E8923D',
+    kana: [
+      { char: 'わ', romaji: 'wa' },
+      { char: 'を', romaji: 'wo' },
+      { char: 'ん', romaji: 'n' },
+    ],
+    examples: [
+      { kana: 'わたし', romaji: 'watashi', meaning: 'I / me' },
+      { kana: 'わかる', romaji: 'wakaru', meaning: 'to understand' },
+      { kana: 'ほん', romaji: 'hon', meaning: 'book' },
+      { kana: 'にほん', romaji: 'nihon', meaning: 'Japan' },
+      { kana: 'えん', romaji: 'en', meaning: 'yen' },
+    ],
+  },
 ]
 
 // Short memory hooks shown on the Learn-stage flashcards. Keep them punchy —
@@ -146,56 +247,137 @@ export const KANA_TIPS = {
   ぬ: 'Tangled noodles — nu',
   ね: 'A cat with a curly tail — ne',
   の: 'A "no entry" swirl — no',
+  は: 'A person beside a box — ha',
+  ひ: 'A wide smile — "hee" hee',
+  ふ: 'Mt. Fuji puffing steam — fu',
+  へ: 'A gentle hill slope — he',
+  ほ: 'は with an extra mast — ho',
+  ま: 'A swirl over two lines — ma',
+  み: 'A curvy number 21 — mi',
+  む: 'A cow mooing "muu" — mu',
+  め: 'A looped noodle knot — me',
+  も: 'A fish hook with a crossbar — mo',
+  や: 'A yacht sail — ya',
+  ゆ: 'A fish swimming — yu',
+  よ: 'A hook with a crossbar — yo',
+  ら: 'A person sitting up — ra',
+  り: 'Two tall reeds — ri',
+  る: 'A curl with a loop — ru',
+  れ: 'Like る but flicked open — re',
+  ろ: 'る without the loop — ro',
+  わ: 'A swan gliding — wa',
+  を: 'A fancy お — "wo" (the object particle)',
+  ん: 'A single squiggle — n',
 }
 
-// World structure: ordered nodes laid out on the map. Positions are % of the
-// world scene, which is locked to the background art's aspect ratio so the
-// markers land on the painted dirt-path clearings on every device. Each node
-// has a `marker` describing the kind of place it is, so the player understands
-// its function before tapping.
+// World structure: an ordered list of worlds, each a vertically-scrollable map.
+// Positions are % of the world scene (locked to the art's aspect ratio). Worlds
+// unlock in order — a world opens once the previous world's boss is cleared.
 //
-// NOTE: these coordinates are tuned to the painted path in the current forest
-// background. If the background art changes, re-tune them here.
-export const WORLD = {
-  id: 'forest',
-  name: 'Forest of Hiragana',
-  // Aspect ratio of the background art (width / height) — the scene is locked
-  // to this so node % positions map straight onto the painted path.
-  art: { w: 1536, h: 2752 },
-  // Kiko's permanent home: a dirt clearing off the path. She never moves from
-  // here; only her pose/expression changes with the player's progress.
-  // (Placed via the in-app layout editor.)
-  kikoHome: { x: 24.7, y: 17.5 },
-  // Hand-tuned dotted trail (waypoints in % of the scene) tracing the painted
-  // dirt path. Authored in the in-app layout editor.
-  path: [
-    { x: 50, y: 86.1 },
-    { x: 72.6, y: 84.7 },
-    { x: 79.3, y: 79.3 },
-    { x: 73.8, y: 72.7 },
-    { x: 76.7, y: 65.6 },
-    { x: 67.7, y: 71.4 },
-    { x: 48.8, y: 68.8 },
-    { x: 23.5, y: 67.1 },
-    { x: 17.2, y: 54.2 },
-    { x: 40, y: 50.9 },
-    { x: 50.7, y: 51.6 },
-    { x: 71.5, y: 51.5 },
-    { x: 78, y: 45.8 },
-    { x: 74, y: 35.7 },
-    { x: 75.4, y: 23.8 },
-    { x: 48.6, y: 23.8 },
-    { x: 29.5, y: 26.6 },
-    { x: 22.9, y: 35 },
-  ],
-  nodes: [
-    { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 51.2, y: 87.2 } },
-    { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 77.1, y: 66.6 } },
-    { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 24.3, y: 67.6 } },
-    { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 50.2, y: 52 } },
-    { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 75.5, y: 24.7 } },
-    { id: 'boss', type: 'boss', lessonId: null, label: 'B', marker: 'torii', place: "Guardian's Gate", pos: { x: 23.2, y: 30.5 } },
-  ],
+// PLACEHOLDER NOTE: every world currently reuses the same background art, dotted
+// path, and node coordinates. Real per-world backgrounds + hand-placed nodes
+// come later (via the layout editor). The order/gating/content is final.
+const PLACEHOLDER_PATH = [
+  { x: 50, y: 86.1 },
+  { x: 72.6, y: 84.7 },
+  { x: 79.3, y: 79.3 },
+  { x: 73.8, y: 72.7 },
+  { x: 76.7, y: 65.6 },
+  { x: 67.7, y: 71.4 },
+  { x: 48.8, y: 68.8 },
+  { x: 23.5, y: 67.1 },
+  { x: 17.2, y: 54.2 },
+  { x: 40, y: 50.9 },
+  { x: 50.7, y: 51.6 },
+  { x: 71.5, y: 51.5 },
+  { x: 78, y: 45.8 },
+  { x: 74, y: 35.7 },
+  { x: 75.4, y: 23.8 },
+  { x: 48.6, y: 23.8 },
+  { x: 29.5, y: 26.6 },
+  { x: 22.9, y: 35 },
+]
+// Shared placeholder node coordinates (5 lessons + a boss) reused per world.
+const PLACEHOLDER_SLOTS = [
+  { marker: 'book', pos: { x: 51.2, y: 87.2 } },
+  { marker: 'study', pos: { x: 77.1, y: 66.6 } },
+  { marker: 'scroll', pos: { x: 24.3, y: 67.6 } },
+  { marker: 'lantern', pos: { x: 50.2, y: 52 } },
+  { marker: 'altar', pos: { x: 75.5, y: 24.7 } },
+  { marker: 'torii', pos: { x: 23.2, y: 30.5 } },
+]
+// Build a world's nodes from a prefix + five lesson ids + place names.
+function buildNodes(prefix, lessonIds, places) {
+  const nodes = lessonIds.map((lessonId, i) => ({
+    id: `${prefix}n${i + 1}`,
+    type: 'lesson',
+    lessonId,
+    label: `${i + 1}`,
+    marker: PLACEHOLDER_SLOTS[i].marker,
+    place: places[i],
+    pos: PLACEHOLDER_SLOTS[i].pos,
+  }))
+  nodes.push({
+    id: `${prefix}boss`,
+    type: 'boss',
+    lessonId: null,
+    label: 'B',
+    marker: PLACEHOLDER_SLOTS[5].marker,
+    place: places[5],
+    pos: PLACEHOLDER_SLOTS[5].pos,
+  })
+  return nodes
+}
+
+export const WORLDS = [
+  {
+    id: 'forest',
+    name: 'Forest of First Sounds',
+    art: { w: 1536, h: 2752 },
+    kikoHome: { x: 24.7, y: 17.5 },
+    path: PLACEHOLDER_PATH,
+    bossName: 'Hiragana Guardian',
+    nodes: [
+      { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 51.2, y: 87.2 } },
+      { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 77.1, y: 66.6 } },
+      { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 24.3, y: 67.6 } },
+      { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 50.2, y: 52 } },
+      { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 75.5, y: 24.7 } },
+      { id: 'boss', type: 'boss', lessonId: null, label: 'B', marker: 'torii', place: "Guardian's Gate", pos: { x: 23.2, y: 30.5 } },
+    ],
+  },
+  {
+    id: 'meadow',
+    name: 'Meadow of New Voices',
+    art: { w: 1536, h: 2752 },
+    kikoHome: { x: 24.7, y: 17.5 },
+    path: PLACEHOLDER_PATH,
+    bossName: 'Echo Spirit',
+    nodes: buildNodes(
+      'w2',
+      ['l6', 'l7', 'l8', 'l9', 'l10'],
+      ['Hill Path', 'Marsh Hollow', 'Valley Rise', 'River Bend', 'Wood Gate', "Spirit's Arch"],
+    ),
+  },
+]
+
+// Flat lookups across every world.
+export const ALL_NODES = WORLDS.flatMap((w) => w.nodes.map((n) => ({ ...n, worldId: w.id })))
+export const TOTAL_NODES = ALL_NODES.length
+export function getNode(nodeId) {
+  return ALL_NODES.find((n) => n.id === nodeId) || null
+}
+export function getWorldOf(nodeId) {
+  return WORLDS.find((w) => w.nodes.some((n) => n.id === nodeId)) || null
+}
+export function worldBossId(world) {
+  return world.nodes.find((n) => n.type === 'boss').id
+}
+// A world is unlocked when the previous world's boss is in `completed`.
+export function worldUnlocked(worldId, completed) {
+  const idx = WORLDS.findIndex((w) => w.id === worldId)
+  if (idx <= 0) return true
+  return completed.includes(worldBossId(WORLDS[idx - 1]))
 }
 
 // Boss definition: the Hiragana Guardian (a friendly wolf spirit).
@@ -438,11 +620,12 @@ export function buildReviewSteps(srs = {}, masteredChars = [], count = 12, vocab
   return [...overdue, ...fresh, ...upcoming].slice(0, count).map(reviewQuestion)
 }
 
-// Build a mixed boss gauntlet drawing from every kana in the forest.
-export function buildBossQuestions(count = 8) {
-  const all = LESSONS.flatMap((l) => l.kana)
-  const picked = shuffle(all).slice(0, count)
-  return picked.map(makeQuestion)
+// Build a mixed boss gauntlet drawing from the kana of one world's lessons.
+export function buildBossQuestions(worldId, count = 12) {
+  const world = WORLDS.find((w) => w.id === worldId) || WORLDS[0]
+  const lessons = world.nodes.filter((n) => n.lessonId).map((n) => getLesson(n.lessonId)).filter(Boolean)
+  const all = lessons.flatMap((l) => l.kana)
+  return shuffle(all).slice(0, count).map(makeQuestion)
 }
 
 // Build a free-practice set. Draws from the player's mastered kana (by char);
@@ -476,9 +659,10 @@ export const TOTAL_KANA = LESSONS.reduce((n, l) => n + l.kana.length, 0)
 export function getKikoLine({ currentNode, completedCount, justCleared, milestone }) {
   if (milestone) return `${milestone.label} +${milestone.bonus} petals!`
   if (justCleared) return 'Nice work! Ready for the next one?'
-  if (!currentNode) return 'The whole forest is cleared. You did it!'
-  if (currentNode.type === 'boss') return "The Guardian's gate is just ahead — ready?"
+  if (!currentNode) return 'Every world is cleared. You did it!'
+  if (currentNode.type === 'boss') return 'The guardian is just ahead — ready?'
   if (completedCount === 0) return "Welcome! Let's learn our first kana together."
-  if (completedCount === WORLD.nodes.length - 2) return 'Only one lesson until the boss!'
+  const world = getWorldOf(currentNode.id)
+  if (world && completedCount === world.nodes.length - 2) return 'Only one lesson until the boss!'
   return `Let's study at the ${currentNode.place}!`
 }

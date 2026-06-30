@@ -457,3 +457,35 @@ img { -webkit-user-drag: none; }
 .cal__dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
 .cal__dot.is-done { background: var(--fox); }
 .cal__dot.is-frozen { background: #cdebff; }
+
+/* ── Multi-world map stack ─────────────────────────────────────────────── */
+.worldmap__stack { display: flex; flex-direction: column; }
+.world { position: relative; }
+.world__label {
+  position: sticky; top: 0; z-index: 9;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 12px; background: linear-gradient(180deg, #1f6f4d, #15543a);
+  color: #fff; font-weight: 900; font-size: 14px; letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.world.is-locked .world__label { background: linear-gradient(180deg, #5d5f5c, #474946); }
+.world.is-locked .worldmap__bg-img { filter: grayscale(0.85) brightness(0.7); }
+
+/* Sealed-world overlay */
+.world__lock {
+  position: absolute; inset: 0; z-index: 10; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  background: rgba(34, 42, 38, 0.6); backdrop-filter: blur(1px); text-align: center; padding: 20px;
+}
+.world__lock-badge {
+  width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255,255,255,0.16); color: #fff; border: 2px solid rgba(255,255,255,0.5);
+}
+.world__lock-text { color: #fff; font-weight: 800; font-size: 14px; max-width: 220px; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+
+/* Sticky flash toast over the scroll */
+.worldmap > .worldmap__flash { position: sticky; top: 12px; left: auto; transform: none; margin: 0 auto; display: block; width: max-content; }
+
+/* Learn tab — grouped by world */
+.learn-world { margin-bottom: 18px; }
+.learn-world__name { font-size: 13px; font-weight: 900; color: var(--green-700); margin: 6px 2px 8px; text-transform: uppercase; letter-spacing: 0.5px; }

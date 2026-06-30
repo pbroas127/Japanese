@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { buildBossQuestions, BOSS } from '../data/gameData'
+import { buildBossQuestions, getWorldOf, BOSS } from '../data/gameData'
 import { useTransientState } from '../state/useTransientState'
 import KikoCharacter from './KikoCharacter'
 import BossCharacter from './BossCharacter'
@@ -15,7 +15,9 @@ import Icon from './Icon'
 //  are synced to each hit and always settle back to idle.
 // ──────────────────────────────────────────────────────────────────────────
 export default function BossFight({ node, xp, streak, petals, onWin, onLose, onExit }) {
-  const questions = useMemo(() => buildBossQuestions(12), [])
+  const world = getWorldOf(node.id)
+  const bossName = world?.bossName || BOSS.name
+  const questions = useMemo(() => buildBossQuestions(world?.id, 12), [world])
 
   const [bossHp, setBossHp] = useState(BOSS.maxHp)
   const [kikoHp, setKikoHp] = useState(BOSS.kikoMaxHp)
@@ -74,12 +76,12 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
         ‹ Flee
       </button>
 
-      <h2 className="boss__title"><Icon name="sword" size={20} /> {BOSS.name}</h2>
+      <h2 className="boss__title"><Icon name="sword" size={20} /> {bossName}</h2>
 
       <div className="boss__arena">
         {/* Boss side */}
         <div className="boss__fighter boss__fighter--enemy">
-          <HpBar label={BOSS.name} pct={bossPct} variant="enemy" />
+          <HpBar label={bossName} pct={bossPct} variant="enemy" />
           <BossCharacter state={bossState} size={180} />
         </div>
 
@@ -115,7 +117,7 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
                   <KikoCharacter state="victory" size={150} shadow={false} />
                   <h2 className="result-panel__title">Guardian Calmed!</h2>
                   <p className="result-panel__sub">
-                    You cleared the Forest of Hiragana! +250 XP and a pile of Sakura Petals.
+                    You cleared the {world?.name || 'world'}! +250 XP and a pile of Sakura Petals.
                   </p>
                   <motion.button className="btn btn--primary" onClick={onExit} whileTap={{ scale: 0.95 }}>
                     Finish World
