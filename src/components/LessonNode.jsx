@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { NODE_ASSETS, NODE_FALLBACK } from '../assets/assetMap'
 import Icon from './Icon'
+import StageDots from './StageDots'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  LessonNode — a themed place embedded in the world. The marker communicates
@@ -8,7 +9,7 @@ import Icon from './Icon'
 //  nodes get a consistent check badge; the current node glows (centered on the
 //  marker) and shows a small info panel directly above it.
 // ──────────────────────────────────────────────────────────────────────────
-export default function LessonNode({ node, status, title, onSelect }) {
+export default function LessonNode({ node, status, title, stagesDone = 0, onSelect }) {
   const isBoss = node.type === 'boss'
   const clickable = status === 'current'
   const set = NODE_ASSETS[node.marker] || NODE_ASSETS.book
@@ -59,6 +60,8 @@ export default function LessonNode({ node, status, title, onSelect }) {
           <Icon name="check" size={14} />
         </span>
       )}
+
+      {!isBoss && <StageDots done={status === 'completed' ? 3 : stagesDone} className="node__dots" />}
 
       {isBoss && status !== 'locked' && <span className="node__boss-tag">BOSS</span>}
 

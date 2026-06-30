@@ -26,6 +26,9 @@ const DEFAULT_STATE = {
   freezes: STARTING_FREEZES,
   petals: 0,
   completed: [],
+  // Per-node stage progress for the 3-stage levels (Learn → Use → Quiz).
+  // { [nodeId]: { stagesDone: 0..3, quizPassed: boolean } }
+  progress: {},
   stats: { lessonsCompleted: 0, totalQuestions: 0, totalCorrect: 0, bossesDefeated: 0, kana: [] },
   settings: { sound: true, music: false, notifications: false, reducedMotion: false },
   account: { signedIn: false, username: null },
@@ -112,6 +115,22 @@ export function useGameState() {
 
   const getStatus = useCallback((nodeId) => getNodeStatus(nodeId, state.completed), [state.completed])
 
+  // Read a node's stage progress (with a safe default for untouched nodes).
+  const getProgress = useCallback(
+    (nodeId) => state.progress[nodeId] || { stagesDone: 0, quizPassed: false },
+    [state.progress],
+  )
+
+  // Mark a non-quiz stage (1 = Learn, 2 = Use) as finished. Only ever raises
+  // the count, never lowers it, so re-entering a level keeps your progress.
+  const completeStage = useCallback((nodeId, stage) => {
+    setState((prev) => {
+      const cur = prev.progress[nodeId] || { stagesDone: 0, quizPassed: false }
+      if (cur.stagesDone >= stage) return prev
+      return { ...prev, progress: { ...prev.progress, [nodeId]: { ...cur, stagesDone: stage } } }
+    })
+  }, [])
+
   const passLesson = useCallback((node, correct, total) => {
     const lesson = getLesson(node.lessonId)
     const kanaChars = lesson ? lesson.kana.map((k) => k.char) : []
@@ -122,6 +141,7 @@ export function useGameState() {
       return {
         ...prev,
         completed: prev.completed.includes(node.id) ? prev.completed : [...prev.completed, node.id],
+        progress: { ...prev.progress, [node.id]: { stagesDone: 3, quizPassed: true } },
         xp: prev.xp + XP_LESSON_CLEAR + correct * XP_PER_CORRECT,
         petals: prev.petals + PETALS_LESSON_CLEAR + correct * PETALS_PER_CORRECT + bonus,
         streak: s.streak,
@@ -215,6 +235,8 @@ export function useGameState() {
     ...derived,
     flash,
     getStatus,
+    getProgress,
+    completeStage,
     passLesson,
     failLesson,
     winBoss,

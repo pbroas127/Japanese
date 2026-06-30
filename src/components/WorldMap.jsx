@@ -15,7 +15,7 @@ import { smoothPath } from '../utils/path'
 //  is the one painted into the art (no drawn overlay). Kiko lives permanently
 //  on her dirt patch (WORLD.kikoHome) and only changes pose with progress.
 // ──────────────────────────────────────────────────────────────────────────
-export default function WorldMap({ getStatus, onSelectNode, worldComplete, streak, flash, onClearFlash }) {
+export default function WorldMap({ getStatus, getProgress, onSelectNode, worldComplete, streak, flash, onClearFlash }) {
   const nodes = WORLD.nodes
   const currentNode = nodes.find((n) => getStatus(n.id) === 'current') || null
   const completedCount = nodes.filter((n) => getStatus(n.id) === 'completed').length
@@ -69,6 +69,7 @@ export default function WorldMap({ getStatus, onSelectNode, worldComplete, strea
             key={node.id}
             node={node}
             status={getStatus(node.id)}
+            stagesDone={getProgress?.(node.id).stagesDone ?? 0}
             title={node.type === 'boss' ? 'Hiragana Guardian' : getLesson(node.lessonId)?.title}
             onSelect={onSelectNode}
           />

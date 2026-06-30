@@ -46,6 +46,8 @@ export default function App() {
                   xp={game.xp}
                   streak={game.streak}
                   petals={game.petals}
+                  stagesDone={game.getProgress(overlayNode.id).stagesDone}
+                  onStage={game.completeStage}
                   onPass={game.passLesson}
                   onFail={game.failLesson}
                   onExit={closeOverlay}
@@ -84,6 +86,7 @@ export default function App() {
                     {tab === 'map' && (
                       <WorldMap
                         getStatus={game.getStatus}
+                        getProgress={game.getProgress}
                         onSelectNode={openNode}
                         worldComplete={game.worldComplete}
                         streak={game.streak}

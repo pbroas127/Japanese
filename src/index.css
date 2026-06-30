@@ -343,3 +343,18 @@ img { -webkit-user-drag: none; }
 .editor__export-card h3 { font-size: 15px; margin-bottom: 10px; color: #143d2b; }
 .editor__export-text { width: 100%; height: 210px; font-family: ui-monospace, monospace; font-size: 11px; border: 2px solid #e7dcc8; border-radius: 10px; padding: 8px; resize: none; }
 .editor__export-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+
+/* ── Stage dots (3-stage progress indicator) ───────────────────────────── */
+.stage-dots { display: inline-block; line-height: 0; }
+.stage-dots__svg { display: block; width: 100%; height: auto; overflow: visible; }
+.stage-dot { fill: rgba(255,255,255,0.34); stroke: rgba(40,60,40,0.55); stroke-width: 1.1; transition: fill 0.25s ease; }
+.stage-dot.is-filled { fill: var(--green-500); stroke: #2f6d46; filter: drop-shadow(0 0 3px rgba(95,191,140,0.95)); }
+
+/* Under a world-map node */
+.node__dots { position: absolute; top: 100%; left: 50%; width: 38px; margin-left: -19px; margin-top: 4px; pointer-events: none; z-index: 7; }
+.node--boss .node__dots { display: none; }
+
+/* In the lesson stage header */
+.lesson__stages { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 2px 0 12px; }
+.lesson__stages-dots { width: 48px; }
+.lesson__stages-label { font-size: 12px; font-weight: 800; color: var(--ink-soft); letter-spacing: 0.3px; }
