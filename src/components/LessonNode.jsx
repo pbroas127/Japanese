@@ -37,8 +37,6 @@ export default function LessonNode({ node, status, title, onSelect }) {
         onClick={() => clickable && onSelect(node)}
         disabled={!clickable}
         aria-label={`${node.place} — ${status}`}
-        animate={status === 'current' ? { y: [0, -5, 0] } : { y: 0 }}
-        transition={{ duration: 1.7, repeat: status === 'current' ? Infinity : 0, ease: 'easeInOut' }}
         whileTap={clickable ? { scale: 0.92 } : {}}
         whileHover={clickable ? { scale: 1.06 } : {}}
       >
