@@ -11,7 +11,7 @@ import ProgressPage from './components/ProgressPage'
 import SettingsPage from './components/SettingsPage'
 import LessonScreen from './components/LessonScreen'
 import BossFight from './components/BossFight'
-import MapEditor from './components/MapEditor'
+import StreakPage from './components/StreakPage'
 
 const pageMotion = {
   initial: { opacity: 0, y: 12 },
@@ -24,7 +24,6 @@ export default function App() {
   const game = useGameState()
   const [tab, setTab] = useState('map')
   const [overlay, setOverlay] = useState(null) // { type:'lesson'|'boss', nodeId }
-  const [editing, setEditing] = useState(false)
 
   const openNode = (node) => setOverlay({ type: node.type === 'boss' ? 'boss' : 'lesson', nodeId: node.id })
   const closeOverlay = () => setOverlay(null)
@@ -47,6 +46,7 @@ export default function App() {
                   streak={game.streak}
                   petals={game.petals}
                   stagesDone={game.getProgress(overlayNode.id).stagesDone}
+                  streakActiveToday={game.streakActiveToday}
                   onStage={game.completeStage}
                   onPass={game.passLesson}
                   onFail={game.failLesson}
@@ -78,6 +78,7 @@ export default function App() {
                 petals={game.petals}
                 onOpenProfile={() => setTab('progress')}
                 onOpenSettings={() => setTab('settings')}
+                onOpenStreak={() => setTab('streak')}
               />
 
               <main className="shell__content">
@@ -98,21 +99,14 @@ export default function App() {
                     {tab === 'practice' && <PracticeScreen masteredChars={game.stats.kana} />}
                     {tab === 'progress' && <ProgressPage game={game} />}
                     {tab === 'settings' && <SettingsPage game={game} />}
+                    {tab === 'streak' && <StreakPage game={game} onClose={() => setTab('map')} />}
                   </motion.div>
                 </AnimatePresence>
               </main>
 
               <BottomNav active={tab} onChange={setTab} />
-
-              {tab === 'map' && (
-                <button className="edit-fab" onClick={() => setEditing(true)}>
-                  Edit Layout
-                </button>
-              )}
             </div>
           )}
-
-          {editing && <MapEditor onExit={() => setEditing(false)} />}
         </div>
       </div>
     </MotionConfig>

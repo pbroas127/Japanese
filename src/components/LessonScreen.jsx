@@ -38,6 +38,7 @@ export default function LessonScreen({
   streak,
   petals,
   stagesDone = 0,
+  streakActiveToday = false,
   onStage,
   onPass,
   onFail,
@@ -58,14 +59,14 @@ export default function LessonScreen({
   const headerStage = phase === 'use' ? 2 : phase === 'quiz' ? 3 : 1
 
   const finishLearn = (score) => {
-    onStage?.(node, 1)
+    onStage?.(node.id, 1)
     setBanked((b) => Math.max(b, 1))
     setInter({ title: 'Stage 1 complete', sub: 'You met the kana', score, next: 'use', nextLabel: 'Next: Use →' })
     setPhase('stageDone')
   }
 
   const finishUse = (score) => {
-    onStage?.(node, 2)
+    onStage?.(node.id, 2)
     setBanked((b) => Math.max(b, 2))
     setInter({ title: 'Stage 2 complete', sub: 'You used them in words', score, next: 'quiz', nextLabel: 'Start Quiz →' })
     setPhase('stageDone')
@@ -75,12 +76,13 @@ export default function LessonScreen({
     const pass = total ? correct / total >= PASS_THRESHOLD : true
     if (pass) onPass(node, correct, total)
     else onFail(node, correct, total)
+    // The streak only advances on the first level cleared each day.
     setResult({
       pass,
       correct,
       total,
       xpGained: pass ? XP_LESSON_CLEAR + correct * XP_PER_CORRECT : 0,
-      streak: pass ? streak + 1 : streak,
+      streak: pass && !streakActiveToday ? streak + 1 : streak,
     })
     setPhase('result')
   }

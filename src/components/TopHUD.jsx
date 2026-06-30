@@ -6,7 +6,7 @@ import Icon from './Icon'
 //  TopHUD — fantasy status bar: level crest, XP bar, streak (with milestone
 //  glow), Sakura Petals currency, and profile / settings buttons.
 // ──────────────────────────────────────────────────────────────────────────
-export default function TopHUD({ xp, streak, petals, onOpenProfile, onOpenSettings, compact = false }) {
+export default function TopHUD({ xp, streak, petals, onOpenProfile, onOpenSettings, onOpenStreak, compact = false }) {
   const level = levelFromXp(xp)
   const pct = Math.min(100, Math.round((xpIntoLevel(xp) / XP_PER_LEVEL) * 100))
   const tier = streakTier(streak)
@@ -29,16 +29,20 @@ export default function TopHUD({ xp, streak, petals, onOpenProfile, onOpenSettin
         </div>
       </div>
 
-      <motion.div
+      <motion.button
+        type="button"
         className={`hud__chip hud__chip--streak tier-${tier} ${streak > 0 ? 'is-hot' : ''}`}
         animate={streak > 0 ? { scale: [1, 1.16, 1] } : { scale: 1 }}
         transition={{ duration: 0.4 }}
         key={streak}
         title={`${streak}-day streak`}
+        onClick={onOpenStreak}
+        disabled={!onOpenStreak}
+        whileTap={onOpenStreak ? { scale: 0.92 } : {}}
       >
         <Icon name="flame" size={16} className="hud__chip-icon" />
         <span className="hud__chip-val">{streak}</span>
-      </motion.div>
+      </motion.button>
 
       <div className="hud__chip hud__chip--petals" title={CURRENCY.name}>
         <Icon name="petal" size={16} className="hud__chip-icon" />

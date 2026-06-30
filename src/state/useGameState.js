@@ -11,6 +11,7 @@ import {
   PETALS_LESSON_CLEAR,
   PETALS_BOSS_CLEAR,
   PETALS_PER_CORRECT,
+  PETALS_PER_STAGE,
   FREEZE_COST,
   STARTING_FREEZES,
 } from '../data/gameData'
@@ -23,6 +24,8 @@ const DEFAULT_STATE = {
   streak: 0, // consecutive DAYS with a completed lesson
   bestStreak: 0,
   lastActive: null, // YYYY-MM-DD of the last day a lesson was cleared
+  history: [], // every YYYY-MM-DD the player completed something (for the calendar)
+  freezeDays: [], // days bridged by a streak freeze (shown on the calendar)
   freezes: STARTING_FREEZES,
   petals: 0,
   completed: [],
@@ -71,17 +74,31 @@ function todayStr() {
 function dayDiff(a, b) {
   return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000)
 }
+// The date strings strictly between two days (the missed days a freeze covers).
+function missedDates(fromStr, toStr) {
+  const out = []
+  let d = new Date(fromStr + 'T00:00:00')
+  const end = new Date(toStr + 'T00:00:00')
+  d = new Date(d.getTime() + 86400000)
+  while (d < end) {
+    out.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+    d = new Date(d.getTime() + 86400000)
+  }
+  return out
+}
 
 // Advance the daily streak when a lesson is cleared. Same-day clears don't
 // bump it; a 1-day gap continues it; bigger gaps are bridged by streak freezes
 // (one freeze per missed day) and otherwise reset the streak to 1.
 function advanceStreak(prev) {
   const today = todayStr()
+  // Already counted today — completing more lessons doesn't bump the streak.
   if (prev.lastActive === today) {
-    return { streak: prev.streak, freezes: prev.freezes, lastActive: today, milestone: null }
+    return { streak: prev.streak, freezes: prev.freezes, lastActive: today, milestone: null, freezeUsedDays: [] }
   }
   let streak
   let freezes = prev.freezes
+  let freezeUsedDays = []
   if (!prev.lastActive) {
     streak = 1
   } else {
@@ -93,12 +110,13 @@ function advanceStreak(prev) {
       if (freezes >= missed) {
         freezes -= missed
         streak = prev.streak + 1
+        freezeUsedDays = missedDates(prev.lastActive, today)
       } else {
         streak = 1
       }
     }
   }
-  return { streak, freezes, lastActive: today, milestone: crossedMilestone(prev.streak, streak) }
+  return { streak, freezes, lastActive: today, milestone: crossedMilestone(prev.streak, streak), freezeUsedDays }
 }
 
 export function useGameState() {
@@ -127,7 +145,12 @@ export function useGameState() {
     setState((prev) => {
       const cur = prev.progress[nodeId] || { stagesDone: 0, quizPassed: false }
       if (cur.stagesDone >= stage) return prev
-      return { ...prev, progress: { ...prev.progress, [nodeId]: { ...cur, stagesDone: stage } } }
+      // Small petal reward for finishing a (non-quiz) stage.
+      return {
+        ...prev,
+        petals: prev.petals + PETALS_PER_STAGE,
+        progress: { ...prev.progress, [nodeId]: { ...cur, stagesDone: stage } },
+      }
     })
   }, [])
 
@@ -148,6 +171,8 @@ export function useGameState() {
         bestStreak: Math.max(prev.bestStreak, s.streak),
         freezes: s.freezes,
         lastActive: s.lastActive,
+        history: prev.history.includes(s.lastActive) ? prev.history : [...prev.history, s.lastActive],
+        freezeDays: s.freezeUsedDays.length ? uniq([...prev.freezeDays, ...s.freezeUsedDays]) : prev.freezeDays,
         stats: {
           ...prev.stats,
           lessonsCompleted: prev.stats.lessonsCompleted + 1,
@@ -186,6 +211,8 @@ export function useGameState() {
         bestStreak: Math.max(prev.bestStreak, s.streak),
         freezes: s.freezes,
         lastActive: s.lastActive,
+        history: prev.history.includes(s.lastActive) ? prev.history : [...prev.history, s.lastActive],
+        freezeDays: s.freezeUsedDays.length ? uniq([...prev.freezeDays, ...s.freezeUsedDays]) : prev.freezeDays,
         stats: { ...prev.stats, bossesDefeated: prev.stats.bossesDefeated + 1 },
       }
     })
@@ -223,6 +250,7 @@ export function useGameState() {
     return {
       level: levelFromXp(state.xp),
       worldComplete: state.completed.includes('boss'),
+      streakActiveToday: state.lastActive === todayStr(),
       accuracy: stats.totalQuestions ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0,
       kanaMastered: stats.kana.length,
       totalKana: TOTAL_KANA,

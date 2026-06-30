@@ -154,9 +154,28 @@ export const WORLD = {
   // here; only her pose/expression changes with the player's progress.
   // (Placed via the in-app layout editor.)
   kikoHome: { x: 24.7, y: 17.5 },
-  // Dotted trail disabled for now — nodes read fine on the painted background
-  // without an overlaid path. (Empty = nothing drawn.)
-  path: [],
+  // Hand-tuned dotted trail (waypoints in % of the scene) tracing the painted
+  // dirt path. Authored in the in-app layout editor.
+  path: [
+    { x: 50, y: 86.1 },
+    { x: 72.6, y: 84.7 },
+    { x: 79.3, y: 79.3 },
+    { x: 73.8, y: 72.7 },
+    { x: 76.7, y: 65.6 },
+    { x: 67.7, y: 71.4 },
+    { x: 48.8, y: 68.8 },
+    { x: 23.5, y: 67.1 },
+    { x: 17.2, y: 54.2 },
+    { x: 40, y: 50.9 },
+    { x: 50.7, y: 51.6 },
+    { x: 71.5, y: 51.5 },
+    { x: 78, y: 45.8 },
+    { x: 74, y: 35.7 },
+    { x: 75.4, y: 23.8 },
+    { x: 48.6, y: 23.8 },
+    { x: 29.5, y: 26.6 },
+    { x: 22.9, y: 35 },
+  ],
   nodes: [
     { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 51.2, y: 87.2 } },
     { id: 'n2', type: 'lesson', lessonId: 'l2', label: '2', marker: 'study', place: 'Study Stump', pos: { x: 77.1, y: 66.6 } },
@@ -186,6 +205,7 @@ export const XP_PER_LEVEL = 200
 // Currency — Sakura Petals
 export const CURRENCY = { name: 'Sakura Petals' }
 export const PETALS_PER_CORRECT = 2
+export const PETALS_PER_STAGE = 3 // small reward for finishing Learn / Use
 export const PETALS_LESSON_CLEAR = 15
 export const PETALS_BOSS_CLEAR = 100
 export const FREEZE_COST = 50 // petals to buy one streak freeze
