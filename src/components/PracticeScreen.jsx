@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { buildPracticeSteps, buildMatchPairs, buildTypeDeck } from '../data/gameData'
+import { buildPracticeSteps, buildMatchPairs, buildTypeDeck, buildReviewSteps, countDueItems } from '../data/gameData'
 import StageRunner from './StageRunner'
 import MatchGame from './MatchGame'
 import TypeDrill from './TypeDrill'
@@ -7,9 +7,13 @@ import KikoCharacter from './KikoCharacter'
 import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
-//  PracticeScreen — a practice hub. Pick a deck (Kana / Words) and a drill
-//  (Flashcards / Multiple choice / Match-up / Typing), then run it. Everything
-//  draws from what you've mastered, with a starter set for brand-new players.
+//  PracticeScreen — a practice hub. A smart Daily Review (spaced repetition)
+//  sits up top, then pick a deck (Kana / Words) and a drill (Flashcards /
+//  Multiple choice / Match-up / Typing). Everything draws from what you've
+//  mastered; the review prioritises whatever is due / most overdue.
+//
+//  The session's content is built once when you start it (not in a memo), so
+//  recording SRS results mid-session never reshuffles the questions under you.
 // ──────────────────────────────────────────────────────────────────────────
 const DRILLS = [
   { id: 'flash', label: 'Flashcards', desc: 'Study one at a time', icon: 'book' },
@@ -18,32 +22,43 @@ const DRILLS = [
   { id: 'type', label: 'Typing', desc: 'Type the romaji', icon: 'study' },
 ]
 
-export default function PracticeScreen({ masteredChars }) {
+export default function PracticeScreen({ masteredChars, srs = {}, onReview }) {
   const [view, setView] = useState('hub') // hub | play | summary
   const [deck, setDeck] = useState('kana')
   const [drill, setDrill] = useState('choice')
-  const [session, setSession] = useState(0)
+  const [playData, setPlayData] = useState(null)
   const [result, setResult] = useState(null)
 
-  const data = useMemo(() => {
-    if (view !== 'play') return null
-    if (drill === 'match') return { pairs: buildMatchPairs(masteredChars, deck) }
-    if (drill === 'type') return { deck: buildTypeDeck(masteredChars, deck) }
-    return { steps: buildPracticeSteps(masteredChars, deck, drill, 10) }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, drill, deck, session, masteredChars])
+  const dueCount = useMemo(() => countDueItems(srs, masteredChars), [srs, masteredChars])
+
+  // Build a session's content once, at start (uses the latest srs snapshot).
+  const buildData = (d) => {
+    if (d === 'review') return { steps: buildReviewSteps(srs, masteredChars, 12) }
+    if (d === 'match') return { pairs: buildMatchPairs(masteredChars, deck) }
+    if (d === 'type') return { deck: buildTypeDeck(masteredChars, deck) }
+    return { steps: buildPracticeSteps(masteredChars, deck, d, 10) }
+  }
 
   const start = () => {
-    setSession((s) => s + 1)
+    setPlayData(buildData(drill))
     setView('play')
+  }
+  const startReview = () => {
+    setDrill('review')
+    setPlayData(buildData('review'))
+    setView('play')
+  }
+  const again = () => {
+    setPlayData(buildData(drill))
+    setView('play')
+  }
+  const toHub = () => {
+    if (drill === 'review') setDrill('choice')
+    setView('hub')
   }
   const finish = (r) => {
     setResult({ ...r, drill })
     setView('summary')
-  }
-  const again = () => {
-    setSession((s) => s + 1)
-    setView('play')
   }
 
   // ── HUB ──
@@ -52,6 +67,23 @@ export default function PracticeScreen({ masteredChars }) {
       <div className="page practice-hub">
         <h2 className="page__title">Practice</h2>
         <p className="page__sub">Pick a deck, then how you want to drill</p>
+
+        <button className="review-cta" onClick={startReview} disabled={masteredChars.length === 0}>
+          <span className="review-cta__icon">
+            <Icon name="sparkle" size={22} />
+          </span>
+          <span className="review-cta__text">
+            <span className="review-cta__title">Daily Review</span>
+            <span className="review-cta__sub">
+              {masteredChars.length === 0
+                ? 'Clear a lesson to unlock'
+                : dueCount > 0
+                  ? `${dueCount} due now`
+                  : 'All caught up — review anyway'}
+            </span>
+          </span>
+          {dueCount > 0 && <span className="review-cta__badge">{dueCount}</span>}
+        </button>
 
         <div className="deck-toggle">
           <button className={`deck-toggle__btn ${deck === 'kana' ? 'is-on' : ''}`} onClick={() => setDeck('kana')}>
@@ -87,18 +119,18 @@ export default function PracticeScreen({ masteredChars }) {
   }
 
   // ── PLAY ──
-  if (view === 'play' && data) {
+  if (view === 'play' && playData) {
     return (
       <div className="page practice-play">
-        <button className="practice-play__back" onClick={() => setView('hub')} aria-label="Back to practice">
+        <button className="practice-play__back" onClick={toHub} aria-label="Back to practice">
           ‹ Practice
         </button>
         {drill === 'match' ? (
-          <MatchGame pairs={data.pairs} onDone={finish} />
+          <MatchGame pairs={playData.pairs} onDone={finish} />
         ) : drill === 'type' ? (
-          <TypeDrill deck={data.deck} onDone={finish} />
+          <TypeDrill deck={playData.deck} onDone={finish} />
         ) : (
-          <StageRunner steps={data.steps} onDone={finish} />
+          <StageRunner steps={playData.steps} onReview={onReview} onDone={finish} />
         )}
       </div>
     )
@@ -110,7 +142,9 @@ export default function PracticeScreen({ masteredChars }) {
   return (
     <div className="page practice-done">
       <KikoCharacter state={great ? 'victory' : 'happy'} size={130} />
-      <h2 className="page__title">{result?.drill === 'flash' ? 'Nice review!' : 'Set complete'}</h2>
+      <h2 className="page__title">
+        {result?.drill === 'review' ? 'Review done!' : result?.drill === 'flash' ? 'Nice review!' : 'Set complete'}
+      </h2>
       {scored && (
         <p className="practice-summary__score">
           {result.correct} / {result.total}
@@ -121,7 +155,7 @@ export default function PracticeScreen({ masteredChars }) {
         <button className="btn btn--primary" onClick={again}>
           Again →
         </button>
-        <button className="btn btn--ghost btn--sm" onClick={() => setView('hub')}>
+        <button className="btn btn--ghost btn--sm" onClick={toHub}>
           Back to practice
         </button>
       </div>

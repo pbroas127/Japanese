@@ -3,6 +3,8 @@
 //  Single world MVP. All hiragana content lives here.
 // ──────────────────────────────────────────────────────────────────────────
 
+import { isDue, overdueScore } from '../utils/srs'
+
 // Full romaji pool used to build quiz distractors.
 export const ROMAJI_POOL = [
   'a', 'i', 'u', 'e', 'o',
@@ -273,29 +275,30 @@ const stepId = (p) => `${p}-${(_stepId++).toString(36)}`
 function flashStep(char, romaji, tip, word = false) {
   return { type: 'flash', id: stepId('f'), char, romaji, tip, word }
 }
-function choiceStep(prompt, answer, options, hint) {
-  return { type: 'choice', id: stepId('c'), prompt, answer, options: shuffle(options), hint }
+function choiceStep(prompt, answer, options, hint, item) {
+  return { type: 'choice', id: stepId('c'), prompt, answer, options: shuffle(options), hint, item }
 }
 
+// `item` is the SRS key the question tests: `k:<kana>` or `w:<word>`.
 // kana → romaji (pick the sound)
 function qKanaToRomaji(k) {
   const distractors = shuffle(ROMAJI_POOL.filter((r) => r !== k.romaji)).slice(0, 3)
-  return choiceStep(k.char, k.romaji, [k.romaji, ...distractors], 'Which sound is this?')
+  return choiceStep(k.char, k.romaji, [k.romaji, ...distractors], 'Which sound is this?', `k:${k.char}`)
 }
 // romaji → kana (pick the symbol)
 function qRomajiToKana(k) {
   const distractors = shuffle(ALL_KANA.filter((x) => x.char !== k.char)).slice(0, 3).map((x) => x.char)
-  return choiceStep(k.romaji, k.char, [k.char, ...distractors], 'Tap the matching kana')
+  return choiceStep(k.romaji, k.char, [k.char, ...distractors], 'Tap the matching kana', `k:${k.char}`)
 }
 // meaning → word
 function qMeaningToWord(w) {
   const distractors = shuffle(ALL_WORDS.filter((x) => x.meaning !== w.meaning)).slice(0, 3).map((x) => x.kana)
-  return choiceStep(w.meaning, w.kana, [w.kana, ...distractors], 'Which word means this?')
+  return choiceStep(w.meaning, w.kana, [w.kana, ...distractors], 'Which word means this?', `w:${w.kana}`)
 }
 // word → meaning
 function qWordToMeaning(w) {
   const distractors = shuffle(ALL_WORDS.filter((x) => x.kana !== w.kana)).slice(0, 3).map((x) => x.meaning)
-  return choiceStep(w.kana, w.meaning, [w.meaning, ...distractors], 'What does this word mean?')
+  return choiceStep(w.kana, w.meaning, [w.meaning, ...distractors], 'What does this word mean?', `w:${w.kana}`)
 }
 
 // Stage 1 · Learn — meet each kana on a card, then recognise the sound.
@@ -358,6 +361,44 @@ export function buildTypeDeck(masteredChars, deck = 'kana', count = 8) {
     return shuffle(masteredWords(masteredChars)).slice(0, count).map((w) => ({ id: w.kana, prompt: w.kana, answer: w.romaji, hint: w.meaning }))
   }
   return shuffle(masteredKana(masteredChars)).slice(0, count).map((k) => ({ id: k.char, prompt: k.char, answer: k.romaji }))
+}
+
+// ── Spaced-repetition review ────────────────────────────────────────────────
+// Strict pools (no starter fallback) — review only covers what you've actually
+// mastered, so a brand-new player has nothing "due" yet.
+function reviewItems(masteredChars) {
+  const kana = ALL_KANA.filter((k) => masteredChars.includes(k.char)).map((k) => ({ key: `k:${k.char}`, kind: 'kana', data: k }))
+  const words = ALL_WORDS.filter((w) => [...w.kana].every((ch) => masteredChars.includes(ch))).map((w) => ({ key: `w:${w.kana}`, kind: 'word', data: w }))
+  return [...kana, ...words]
+}
+
+// How many mastered items are currently due for review.
+export function countDueItems(srs = {}, masteredChars = []) {
+  const now = Date.now()
+  return reviewItems(masteredChars).filter((it) => isDue(srs[it.key], now)).length
+}
+
+// Build a review session: due / most-overdue items first, topped up with the
+// rest if fewer than `count` are due. Each item becomes a multiple-choice step.
+export function buildReviewSteps(srs = {}, masteredChars = [], count = 12) {
+  const now = Date.now()
+  const all = reviewItems(masteredChars)
+  const due = all.filter((it) => isDue(srs[it.key], now))
+  due.sort((a, b) => overdueScore(srs[b.key], now) - overdueScore(srs[a.key], now))
+  let picked = due.slice(0, count)
+  if (picked.length < count) {
+    const pickedKeys = new Set(picked.map((it) => it.key))
+    picked = [...picked, ...shuffle(all.filter((it) => !pickedKeys.has(it.key)))].slice(0, count)
+  }
+  return picked.map((it) =>
+    it.kind === 'kana'
+      ? Math.random() < 0.5
+        ? qKanaToRomaji(it.data)
+        : qRomajiToKana(it.data)
+      : Math.random() < 0.5
+        ? qWordToMeaning(it.data)
+        : qMeaningToWord(it.data),
+  )
 }
 
 // Build a mixed boss gauntlet drawing from every kana in the forest.

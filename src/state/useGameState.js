@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { review } from '../utils/srs'
 import {
   WORLD,
   getLesson,
@@ -32,6 +33,8 @@ const DEFAULT_STATE = {
   // Per-node stage progress for the 3-stage levels (Learn → Use → Quiz).
   // { [nodeId]: { stagesDone: 0..3, quizPassed: boolean } }
   progress: {},
+  // Spaced-repetition memory per item — { 'k:あ' | 'w:ねこ': srsCard }.
+  srs: {},
   stats: { lessonsCompleted: 0, totalQuestions: 0, totalCorrect: 0, bossesDefeated: 0, kana: [] },
   settings: { sound: true, music: false, notifications: false, reducedMotion: false },
   account: { signedIn: false, username: null },
@@ -141,6 +144,13 @@ export function useGameState() {
 
   // Mark a non-quiz stage (1 = Learn, 2 = Use) as finished. Only ever raises
   // the count, never lowers it, so re-entering a level keeps your progress.
+  // Record one review result against an item's SRS card (fires on every graded
+  // multiple-choice answer, in lessons and in practice).
+  const recordReview = useCallback((itemKey, correct) => {
+    if (!itemKey) return
+    setState((prev) => ({ ...prev, srs: { ...prev.srs, [itemKey]: review(prev.srs[itemKey], correct) } }))
+  }, [])
+
   const completeStage = useCallback((nodeId, stage) => {
     setState((prev) => {
       const cur = prev.progress[nodeId] || { stagesDone: 0, quizPassed: false }
@@ -265,6 +275,7 @@ export function useGameState() {
     getStatus,
     getProgress,
     completeStage,
+    recordReview,
     passLesson,
     failLesson,
     winBoss,

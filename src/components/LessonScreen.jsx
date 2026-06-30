@@ -40,6 +40,7 @@ export default function LessonScreen({
   stagesDone = 0,
   streakActiveToday = false,
   onStage,
+  onReview,
   onPass,
   onFail,
   onExit,
@@ -118,7 +119,7 @@ export default function LessonScreen({
           <motion.div key="learn" className="lesson__stage-body" {...bodyMotion}>
             <h2 className="lesson__title">{lesson.title}</h2>
             <p className="lesson__subtitle">{lesson.subtitle}</p>
-            <StageRunner steps={learnSteps} streak={streak} onDone={finishLearn} />
+            <StageRunner steps={learnSteps} streak={streak} onReview={onReview} onDone={finishLearn} />
           </motion.div>
         )}
 
@@ -127,7 +128,7 @@ export default function LessonScreen({
           <motion.div key="use" className="lesson__stage-body" {...bodyMotion}>
             <h2 className="lesson__title">Use it in words</h2>
             <p className="lesson__subtitle">Your new kana inside real words</p>
-            <StageRunner steps={useSteps} streak={streak} onDone={finishUse} />
+            <StageRunner steps={useSteps} streak={streak} onReview={onReview} onDone={finishUse} />
           </motion.div>
         )}
 
@@ -136,7 +137,7 @@ export default function LessonScreen({
           <motion.div key={`quiz-${quizKey}`} className="lesson__stage-body" {...bodyMotion}>
             <h2 className="lesson__title">Quiz</h2>
             <p className="lesson__subtitle">Everything you just learned</p>
-            <StageRunner steps={quizSteps} streak={streak} onDone={finishQuiz} />
+            <StageRunner steps={quizSteps} streak={streak} onReview={onReview} onDone={finishQuiz} />
           </motion.div>
         )}
 

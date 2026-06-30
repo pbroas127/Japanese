@@ -48,6 +48,7 @@ export default function App() {
                   stagesDone={game.getProgress(overlayNode.id).stagesDone}
                   streakActiveToday={game.streakActiveToday}
                   onStage={game.completeStage}
+                  onReview={game.recordReview}
                   onPass={game.passLesson}
                   onFail={game.failLesson}
                   onExit={closeOverlay}
@@ -96,7 +97,9 @@ export default function App() {
                       />
                     )}
                     {tab === 'learn' && <LearnScreen getStatus={game.getStatus} onSelectNode={openNode} />}
-                    {tab === 'practice' && <PracticeScreen masteredChars={game.stats.kana} />}
+                    {tab === 'practice' && (
+                      <PracticeScreen masteredChars={game.stats.kana} srs={game.srs} onReview={game.recordReview} />
+                    )}
                     {tab === 'progress' && <ProgressPage game={game} />}
                     {tab === 'settings' && <SettingsPage game={game} />}
                     {tab === 'streak' && <StreakPage game={game} onClose={() => setTab('map')} />}

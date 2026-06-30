@@ -379,6 +379,14 @@ img { -webkit-user-drag: none; }
 .practice-hub__start { width: 100%; max-width: 360px; margin-top: 6px; }
 .practice-hub__note { font-size: 11px; color: var(--ink-soft); font-weight: 700; }
 
+.review-cta { width: 100%; max-width: 360px; display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #2f9d6b, #1f6f4d); color: #fff; border: none; border-radius: 18px; padding: 14px 16px; cursor: pointer; box-shadow: var(--shadow-sm); text-align: left; }
+.review-cta:disabled { background: #cdc6b8; cursor: default; box-shadow: none; }
+.review-cta__icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.22); display: grid; place-items: center; flex: none; }
+.review-cta__text { flex: 1; display: flex; flex-direction: column; }
+.review-cta__title { font-size: 16px; font-weight: 900; }
+.review-cta__sub { font-size: 12px; font-weight: 700; opacity: 0.92; }
+.review-cta__badge { flex: none; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 999px; background: var(--gold); color: var(--green-900); font-weight: 900; font-size: 14px; display: grid; place-items: center; }
+
 .practice-play { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 46px; }
 .practice-play__back { position: absolute; top: 12px; left: 12px; background: #fff; border: none; border-radius: 999px; padding: 7px 14px; font-weight: 800; font-size: 13px; color: var(--green-700); box-shadow: var(--shadow-sm); cursor: pointer; z-index: 5; }
 .practice-done { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }

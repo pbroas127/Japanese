@@ -32,7 +32,7 @@ function StudyCard({ step, onNext }) {
   )
 }
 
-export default function StageRunner({ steps, streak = 0, onDone }) {
+export default function StageRunner({ steps, streak = 0, onDone, onReview }) {
   const gradedTotal = useMemo(() => steps.filter((s) => s.type === 'choice').length, [steps])
   const [i, setI] = useState(0)
   const [chosen, setChosen] = useState(null)
@@ -58,6 +58,7 @@ export default function StageRunner({ steps, streak = 0, onDone }) {
     setLocked(true)
     const ok = opt === step.answer
     if (ok) correctRef.current += 1
+    if (step.item) onReview?.(step.item, ok)
     playKiko(ok ? (streak >= 3 ? 'excited' : 'happy') : 'sad', 900)
     setTimeout(advance, 1050)
   }
