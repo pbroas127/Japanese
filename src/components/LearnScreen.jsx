@@ -1,14 +1,16 @@
 import { motion } from 'framer-motion'
 import { WORLD, getLesson } from '../data/gameData'
+import Icon from './Icon'
 
 const MARKER_ICON = {
-  book: '📖',
-  study: '🧠',
-  scroll: '📜',
-  lantern: '🏮',
-  altar: '🔥',
-  torii: '⛩️',
+  book: 'book',
+  study: 'study',
+  scroll: 'scroll',
+  lantern: 'lantern',
+  altar: 'flame',
+  torii: 'torii',
 }
+const STATUS_ICON = { completed: 'check', current: 'play', locked: 'lock' }
 
 // ──────────────────────────────────────────────────────────────────────────
 //  LearnScreen — a tidy list view of every lesson + the boss, with status.
@@ -36,7 +38,9 @@ export default function LearnScreen({ getStatus, onSelectNode }) {
               transition={{ delay: i * 0.05 }}
               whileTap={open ? { scale: 0.98 } : {}}
             >
-              <span className="learn-card__icon">{MARKER_ICON[node.marker]}</span>
+              <span className="learn-card__icon">
+                <Icon name={MARKER_ICON[node.marker]} size={26} />
+              </span>
               <span className="learn-card__text">
                 <span className="learn-card__title">
                   {node.type === 'boss' ? 'Hiragana Guardian' : lesson.title}
@@ -46,7 +50,7 @@ export default function LearnScreen({ getStatus, onSelectNode }) {
                 </span>
               </span>
               <span className={`learn-card__status status-${status}`}>
-                {status === 'completed' ? '✅' : status === 'current' ? '▶' : '🔒'}
+                <Icon name={STATUS_ICON[status]} size={18} />
               </span>
             </motion.button>
           )

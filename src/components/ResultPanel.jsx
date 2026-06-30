@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import KikoCharacter from './KikoCharacter'
+import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  ResultPanel — shown after a lesson (and after the boss).
@@ -48,8 +49,10 @@ export default function ResultPanel({
             <span className="result-stat__label">XP</span>
           </div>
           <div className="result-stat">
-            <span className="result-stat__value">{streak} 🔥</span>
-            <span className="result-stat__label">Streak</span>
+            <span className="result-stat__value result-stat__value--streak">
+              {streak} <Icon name="flame" size={16} />
+            </span>
+            <span className="result-stat__label">Day streak</span>
           </div>
         </div>
 

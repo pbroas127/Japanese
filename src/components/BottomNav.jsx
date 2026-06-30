@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion'
+import Icon from './Icon'
 
 const TABS = [
-  { id: 'map', icon: '🗺️', label: 'Map' },
-  { id: 'learn', icon: '📚', label: 'Learn' },
-  { id: 'practice', icon: '🎯', label: 'Practice' },
-  { id: 'progress', icon: '📈', label: 'Progress' },
-  { id: 'settings', icon: '⚙️', label: 'Settings' },
+  { id: 'map', icon: 'map', label: 'Map' },
+  { id: 'learn', icon: 'learn', label: 'Learn' },
+  { id: 'practice', icon: 'practice', label: 'Practice' },
+  { id: 'progress', icon: 'progress', label: 'Progress' },
+  { id: 'settings', icon: 'settings', label: 'Settings' },
 ]
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -24,10 +25,10 @@ export default function BottomNav({ active, onChange }) {
           >
             <motion.span
               className="bottomnav__icon"
-              animate={on ? { y: -3, scale: 1.15 } : { y: 0, scale: 1 }}
+              animate={on ? { y: -3, scale: 1.12 } : { y: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 320, damping: 18 }}
             >
-              {t.icon}
+              <Icon name={t.icon} size={24} />
             </motion.span>
             <span className="bottomnav__label">{t.label}</span>
             {on && <motion.span layoutId="navdot" className="bottomnav__dot" />}

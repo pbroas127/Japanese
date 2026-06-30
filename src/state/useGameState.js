@@ -11,6 +11,8 @@ import {
   PETALS_LESSON_CLEAR,
   PETALS_BOSS_CLEAR,
   PETALS_PER_CORRECT,
+  FREEZE_COST,
+  STARTING_FREEZES,
 } from '../data/gameData'
 
 const STORAGE_KEY = 'forest-of-hiragana:v2'
@@ -18,8 +20,10 @@ const NODE_ORDER = WORLD.nodes.map((n) => n.id)
 
 const DEFAULT_STATE = {
   xp: 0,
-  streak: 0,
+  streak: 0, // consecutive DAYS with a completed lesson
   bestStreak: 0,
+  lastActive: null, // YYYY-MM-DD of the last day a lesson was cleared
+  freezes: STARTING_FREEZES,
   petals: 0,
   completed: [],
   stats: { lessonsCompleted: 0, totalQuestions: 0, totalCorrect: 0, bossesDefeated: 0, kana: [] },
@@ -46,7 +50,6 @@ function loadInitial() {
   return DEFAULT_STATE
 }
 
-// Derive a node's status purely from which nodes are completed.
 export function getNodeStatus(nodeId, completed) {
   if (completed.includes(nodeId)) return 'completed'
   const firstIncomplete = NODE_ORDER.find((id) => !completed.includes(id))
@@ -57,36 +60,74 @@ function uniq(arr) {
   return [...new Set(arr)]
 }
 
+// ── Daily-streak helpers ──
+function todayStr() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+function dayDiff(a, b) {
+  return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000)
+}
+
+// Advance the daily streak when a lesson is cleared. Same-day clears don't
+// bump it; a 1-day gap continues it; bigger gaps are bridged by streak freezes
+// (one freeze per missed day) and otherwise reset the streak to 1.
+function advanceStreak(prev) {
+  const today = todayStr()
+  if (prev.lastActive === today) {
+    return { streak: prev.streak, freezes: prev.freezes, lastActive: today, milestone: null }
+  }
+  let streak
+  let freezes = prev.freezes
+  if (!prev.lastActive) {
+    streak = 1
+  } else {
+    const gap = dayDiff(prev.lastActive, today)
+    if (gap <= 1) {
+      streak = prev.streak + 1
+    } else {
+      const missed = gap - 1
+      if (freezes >= missed) {
+        freezes -= missed
+        streak = prev.streak + 1
+      } else {
+        streak = 1
+      }
+    }
+  }
+  return { streak, freezes, lastActive: today, milestone: crossedMilestone(prev.streak, streak) }
+}
+
 export function useGameState() {
   const [state, setState] = useState(loadInitial)
-  const [flash, setFlash] = useState(null) // transient milestone/event toast
+  const [flash, setFlash] = useState(null)
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
     } catch {
-      /* storage may be unavailable; ignore */
+      /* ignore */
     }
   }, [state])
 
   const getStatus = useCallback((nodeId) => getNodeStatus(nodeId, state.completed), [state.completed])
 
-  // Clear a lesson: unlock + XP + petals + streak + stats, with milestone bonus.
   const passLesson = useCallback((node, correct, total) => {
     const lesson = getLesson(node.lessonId)
     const kanaChars = lesson ? lesson.kana.map((k) => k.char) : []
     setState((prev) => {
-      const newStreak = prev.streak + 1
-      const milestone = crossedMilestone(prev.streak, newStreak)
-      const bonus = milestone ? milestone.bonus : 0
-      if (milestone) setFlash({ text: `${milestone.label} +${bonus} 🌸`, tier: milestone.tier })
+      const s = advanceStreak(prev)
+      const bonus = s.milestone ? s.milestone.bonus : 0
+      if (s.milestone) setFlash({ text: `${s.milestone.label} +${bonus} petals`, tier: s.milestone.tier })
       return {
         ...prev,
         completed: prev.completed.includes(node.id) ? prev.completed : [...prev.completed, node.id],
         xp: prev.xp + XP_LESSON_CLEAR + correct * XP_PER_CORRECT,
         petals: prev.petals + PETALS_LESSON_CLEAR + correct * PETALS_PER_CORRECT + bonus,
-        streak: newStreak,
-        bestStreak: Math.max(prev.bestStreak, newStreak),
+        streak: s.streak,
+        bestStreak: Math.max(prev.bestStreak, s.streak),
+        freezes: s.freezes,
+        lastActive: s.lastActive,
         stats: {
           ...prev.stats,
           lessonsCompleted: prev.stats.lessonsCompleted + 1,
@@ -98,11 +139,11 @@ export function useGameState() {
     })
   }, [])
 
-  // Failed a lesson: no unlock, streak resets, but the attempt still counts.
+  // Failing a lesson no longer affects the daily streak; the attempt still
+  // counts toward accuracy.
   const failLesson = useCallback((_node, correct, total) => {
     setState((prev) => ({
       ...prev,
-      streak: 0,
       stats: {
         ...prev.stats,
         totalQuestions: prev.stats.totalQuestions + total,
@@ -113,24 +154,30 @@ export function useGameState() {
 
   const winBoss = useCallback((node) => {
     setState((prev) => {
-      const newStreak = prev.streak + 1
-      const milestone = crossedMilestone(prev.streak, newStreak)
-      const bonus = milestone ? milestone.bonus : 0
-      setFlash({ text: 'World Cleared! 🌳', tier: 'legend' })
+      const s = advanceStreak(prev)
+      const bonus = s.milestone ? s.milestone.bonus : 0
+      setFlash({ text: 'World Cleared!', tier: 'legend' })
       return {
         ...prev,
         completed: prev.completed.includes(node.id) ? prev.completed : [...prev.completed, node.id],
         xp: prev.xp + XP_BOSS_CLEAR,
         petals: prev.petals + PETALS_BOSS_CLEAR + bonus,
-        streak: newStreak,
-        bestStreak: Math.max(prev.bestStreak, newStreak),
+        streak: s.streak,
+        bestStreak: Math.max(prev.bestStreak, s.streak),
+        freezes: s.freezes,
+        lastActive: s.lastActive,
         stats: { ...prev.stats, bossesDefeated: prev.stats.bossesDefeated + 1 },
       }
     })
   }, [])
 
-  const loseBoss = useCallback(() => {
-    setState((prev) => ({ ...prev, streak: 0 }))
+  // Losing the boss doesn't break a daily streak.
+  const loseBoss = useCallback(() => {}, [])
+
+  const buyFreeze = useCallback(() => {
+    setState((prev) =>
+      prev.petals >= FREEZE_COST ? { ...prev, petals: prev.petals - FREEZE_COST, freezes: prev.freezes + 1 } : prev,
+    )
   }, [])
 
   const updateSetting = useCallback((key, value) => {
@@ -172,6 +219,7 @@ export function useGameState() {
     failLesson,
     winBoss,
     loseBoss,
+    buyFreeze,
     updateSetting,
     signIn,
     signOut,

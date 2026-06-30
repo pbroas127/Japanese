@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { levelFromXp, xpIntoLevel, XP_PER_LEVEL, streakTier, CURRENCY } from '../data/gameData'
+import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  TopHUD — fantasy status bar: level crest, XP bar, streak (with milestone
@@ -33,24 +34,24 @@ export default function TopHUD({ xp, streak, petals, onOpenProfile, onOpenSettin
         animate={streak > 0 ? { scale: [1, 1.16, 1] } : { scale: 1 }}
         transition={{ duration: 0.4 }}
         key={streak}
-        title={`${streak}-lesson streak`}
+        title={`${streak}-day streak`}
       >
-        <span className="hud__chip-icon">🔥</span>
+        <Icon name="flame" size={16} className="hud__chip-icon" />
         <span className="hud__chip-val">{streak}</span>
       </motion.div>
 
       <div className="hud__chip hud__chip--petals" title={CURRENCY.name}>
-        <span className="hud__chip-icon">{CURRENCY.icon}</span>
+        <Icon name="petal" size={16} className="hud__chip-icon" />
         <span className="hud__chip-val">{petals}</span>
       </div>
 
       {!compact && (
         <div className="hud__btns">
           <button className="hud__icon-btn" onClick={onOpenProfile} aria-label="Profile">
-            👤
+            <Icon name="profile" size={18} />
           </button>
           <button className="hud__icon-btn" onClick={onOpenSettings} aria-label="Settings">
-            ⚙️
+            <Icon name="settings" size={18} />
           </button>
         </div>
       )}

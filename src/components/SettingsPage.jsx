@@ -25,7 +25,7 @@ export default function SettingsPage({ game }) {
 
   return (
     <div className="page settings-page">
-      <h2 className="page__title">⚙️ Settings</h2>
+      <h2 className="page__title">Settings</h2>
 
       <section className="settings-group">
         <h3 className="settings-group__title">Account</h3>
@@ -48,7 +48,7 @@ export default function SettingsPage({ game }) {
             </button>
           </div>
         )}
-        <p className="settings-note">☁️ Login & cloud save are coming soon — progress is saved on this device for now.</p>
+        <p className="settings-note">Login &amp; cloud save are coming soon — progress is saved on this device for now.</p>
       </section>
 
       <section className="settings-group">

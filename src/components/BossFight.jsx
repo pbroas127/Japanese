@@ -6,6 +6,7 @@ import KikoCharacter from './KikoCharacter'
 import BossCharacter from './BossCharacter'
 import QuizCard from './QuizCard'
 import TopHUD from './TopHUD'
+import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  BossFight — the Hiragana Guardian.
@@ -73,7 +74,7 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
         ‹ Flee
       </button>
 
-      <h2 className="boss__title">⚔️ {BOSS.name}</h2>
+      <h2 className="boss__title"><Icon name="sword" size={20} /> {BOSS.name}</h2>
 
       <div className="boss__arena">
         {/* Boss side */}
@@ -114,10 +115,10 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
                   <KikoCharacter state="victory" size={150} shadow={false} />
                   <h2 className="result-panel__title">Guardian Calmed!</h2>
                   <p className="result-panel__sub">
-                    You cleared the Forest of Hiragana! +250 XP and a shower of 🌸.
+                    You cleared the Forest of Hiragana! +250 XP and a pile of Sakura Petals.
                   </p>
                   <motion.button className="btn btn--primary" onClick={onExit} whileTap={{ scale: 0.95 }}>
-                    Finish World 🌳
+                    Finish World
                   </motion.button>
                 </>
               ) : (

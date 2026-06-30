@@ -152,7 +152,7 @@ export const WORLD = {
     { id: 'n3', type: 'lesson', lessonId: 'l3', label: '3', marker: 'scroll', place: 'Scroll Rock', pos: { x: 24.3, y: 67.6 } },
     { id: 'n4', type: 'lesson', lessonId: 'l4', label: '4', marker: 'lantern', place: 'Lantern Shrine', pos: { x: 50.2, y: 52 } },
     { id: 'n5', type: 'lesson', lessonId: 'l5', label: '5', marker: 'altar', place: 'Flame Altar', pos: { x: 75.5, y: 24.7 } },
-    { id: 'boss', type: 'boss', lessonId: null, label: '★', marker: 'torii', place: "Guardian's Gate", pos: { x: 23.2, y: 33.7 } },
+    { id: 'boss', type: 'boss', lessonId: null, label: 'B', marker: 'torii', place: "Guardian's Gate", pos: { x: 23.2, y: 30.5 } },
   ],
 }
 
@@ -172,11 +172,13 @@ export const XP_LESSON_CLEAR = 50
 export const XP_BOSS_CLEAR = 250
 export const XP_PER_LEVEL = 200
 
-// Currency — Sakura Petals 🌸
-export const CURRENCY = { name: 'Sakura Petals', icon: '🌸' }
+// Currency — Sakura Petals
+export const CURRENCY = { name: 'Sakura Petals' }
 export const PETALS_PER_CORRECT = 2
 export const PETALS_LESSON_CLEAR = 15
 export const PETALS_BOSS_CLEAR = 100
+export const FREEZE_COST = 50 // petals to buy one streak freeze
+export const STARTING_FREEZES = 2
 
 // Streak milestones drive Kiko's reaction + bonus petals.
 export const STREAK_MILESTONES = [
@@ -220,9 +222,10 @@ function makeQuestion(kana) {
   }
 }
 
-// Build the quiz for a lesson — one question per kana introduced.
+// Build the quiz for a lesson — one question per kana, in random order so the
+// sequence of symbols isn't predictable from one attempt to the next.
 export function buildQuiz(lesson) {
-  return lesson.kana.map(makeQuestion)
+  return shuffle(lesson.kana).map(makeQuestion)
 }
 
 // Build a mixed boss gauntlet drawing from every kana in the forest.
@@ -261,9 +264,9 @@ export const TOTAL_KANA = LESSONS.reduce((n, l) => n + l.kana.length, 0)
 
 // Contextual guide line for Kiko based on the current node + progress.
 export function getKikoLine({ currentNode, completedCount, justCleared, milestone }) {
-  if (milestone) return `${milestone.label} 🔥 +${milestone.bonus} petals!`
+  if (milestone) return `${milestone.label} +${milestone.bonus} petals!`
   if (justCleared) return 'Nice work! Ready for the next one?'
-  if (!currentNode) return 'The whole forest is cleared. You did it! 🌳'
+  if (!currentNode) return 'The whole forest is cleared. You did it!'
   if (currentNode.type === 'boss') return "The Guardian's gate is just ahead — ready?"
   if (completedCount === 0) return "Welcome! Let's learn our first kana together."
   if (completedCount === WORLD.nodes.length - 2) return 'Only one lesson until the boss!'

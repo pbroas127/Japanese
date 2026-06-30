@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion'
 import { NODE_ASSETS, NODE_FALLBACK } from '../assets/assetMap'
+import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
-//  LessonNode — a themed place embedded in the world (book / study / scroll /
-//  lantern / altar / torii). The marker itself communicates the node's
-//  function. Locked nodes use a distinct "sealed" asset (not a lock overlay);
-//  completed nodes get a wooden ✅ badge; the current node glows, pulses and
-//  shows a small info panel.
+//  LessonNode — a themed place embedded in the world. The marker communicates
+//  the node's function; locked nodes use a distinct sealed asset; completed
+//  nodes get a consistent check badge; the current node glows (centered on the
+//  marker) and shows a small info panel directly above it.
 // ──────────────────────────────────────────────────────────────────────────
 export default function LessonNode({ node, status, title, onSelect }) {
   const isBoss = node.type === 'boss'
@@ -15,10 +15,9 @@ export default function LessonNode({ node, status, title, onSelect }) {
   const fallback = NODE_FALLBACK[node.marker] || NODE_FALLBACK.book
   const src = status === 'locked' ? set.locked : set.unlocked
 
-  // Edge-aware info panel: flip above when the node sits low, and bias
-  // horizontally so it never clips off the left/right edge of the scene.
-  const vPlace = node.pos.y > 58 ? 'above' : 'below'
-  const hAlign = node.pos.x < 26 ? 'left' : node.pos.x > 74 ? 'right' : 'center'
+  // Info panel sits directly above the marker, centered. Only flips below for
+  // a node that would otherwise run off the top of the scene.
+  const place = node.pos.y < 15 ? 'below' : 'above'
 
   return (
     <div
@@ -28,7 +27,7 @@ export default function LessonNode({ node, status, title, onSelect }) {
       {status === 'current' && (
         <motion.span
           className="node__glow"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.55, 0, 0.55] }}
+          animate={{ scale: [1, 1.25, 1], opacity: [0.55, 0, 0.55] }}
           transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
         />
       )}
@@ -38,9 +37,9 @@ export default function LessonNode({ node, status, title, onSelect }) {
         onClick={() => clickable && onSelect(node)}
         disabled={!clickable}
         aria-label={`${node.place} — ${status}`}
-        animate={status === 'current' ? { y: [0, -6, 0] } : { y: 0 }}
+        animate={status === 'current' ? { y: [0, -5, 0] } : { y: 0 }}
         transition={{ duration: 1.7, repeat: status === 'current' ? Infinity : 0, ease: 'easeInOut' }}
-        whileTap={clickable ? { scale: 0.9 } : {}}
+        whileTap={clickable ? { scale: 0.92 } : {}}
         whileHover={clickable ? { scale: 1.06 } : {}}
       >
         <img
@@ -55,21 +54,26 @@ export default function LessonNode({ node, status, title, onSelect }) {
             }
           }}
         />
-        {status === 'completed' && <span className="node__check">✅</span>}
       </motion.button>
+
+      {status === 'completed' && (
+        <span className="node__check">
+          <Icon name="check" size={14} />
+        </span>
+      )}
 
       {isBoss && status !== 'locked' && <span className="node__boss-tag">BOSS</span>}
 
       {status === 'current' && (
         <motion.div
-          className={`node__info node__info--${vPlace} node__info--${hAlign}`}
-          initial={{ opacity: 0, y: 6 }}
+          className={`node__info node__info--${place}`}
+          initial={{ opacity: 0, y: place === 'above' ? 6 : -6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
           <span className="node__info-place">{node.place}</span>
           <span className="node__info-title">{title}</span>
-          <span className="node__info-cta">Tap to {isBoss ? 'challenge' : 'start'} →</span>
+          <span className="node__info-cta">Tap to {isBoss ? 'challenge' : 'start'}</span>
         </motion.div>
       )}
     </div>

@@ -50,7 +50,7 @@ export default function PracticeScreen({ masteredChars }) {
 
   return (
     <div className="page practice-page">
-      <h2 className="page__title">🎯 Practice</h2>
+      <h2 className="page__title">Practice</h2>
       <p className="page__sub">Free drill · {masteredChars.length > 0 ? 'your mastered kana' : 'starter kana'}</p>
 
       <KikoCharacter state={kikoState} size={120} />
@@ -72,7 +72,7 @@ export default function PracticeScreen({ masteredChars }) {
             {correct} / {total}
           </p>
           <p className="practice-summary__label">
-            {correct === total ? 'Perfect run! 🌸' : 'Nice drilling — keep going!'}
+            {correct === total ? 'Perfect run!' : 'Nice drilling — keep going!'}
           </p>
           <button className="btn btn--primary" onClick={restart}>
             New Set →
