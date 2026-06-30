@@ -386,3 +386,44 @@ img { -webkit-user-drag: none; }
 
 /* Result panel — stacked actions (Try again / Return) */
 .result-panel__actions { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: stretch; }
+
+/* ── Practice hub ──────────────────────────────────────────────────────── */
+.practice-hub { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.deck-toggle { display: flex; gap: 6px; background: #fff; border-radius: 999px; padding: 5px; box-shadow: var(--shadow-sm); }
+.deck-toggle__btn { border: none; background: none; font: inherit; font-weight: 800; font-size: 14px; color: var(--ink-soft); padding: 8px 24px; border-radius: 999px; cursor: pointer; }
+.deck-toggle__btn.is-on { background: var(--green-500); color: #fff; }
+.drill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 360px; }
+.drill-card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; background: #fff; border: 2.5px solid transparent; border-radius: 16px; padding: 13px; cursor: pointer; box-shadow: var(--shadow-sm); text-align: left; }
+.drill-card.is-on { border-color: var(--green-500); }
+.drill-card__icon { width: 34px; height: 34px; border-radius: 10px; background: var(--cream-2); color: var(--green-700); display: grid; place-items: center; margin-bottom: 4px; }
+.drill-card.is-on .drill-card__icon { background: var(--green-500); color: #fff; }
+.drill-card__label { font-size: 14px; font-weight: 900; color: var(--green-900); }
+.drill-card__desc { font-size: 11px; font-weight: 700; color: var(--ink-soft); line-height: 1.2; }
+.practice-hub__start { width: 100%; max-width: 360px; margin-top: 6px; }
+.practice-hub__note { font-size: 11px; color: var(--ink-soft); font-weight: 700; }
+
+.practice-play { position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 46px; }
+.practice-play__back { position: absolute; top: 12px; left: 12px; background: #fff; border: none; border-radius: 999px; padding: 7px 14px; font-weight: 800; font-size: 13px; color: var(--green-700); box-shadow: var(--shadow-sm); cursor: pointer; z-index: 5; }
+.practice-done { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
+
+/* Match-up */
+.match { width: 100%; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 6px; }
+.match__hint { font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+.match__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.match__col { display: flex; flex-direction: column; gap: 10px; }
+.match__tile { font: inherit; font-weight: 800; font-size: 20px; color: var(--ink); background: #fff; border: 2.5px solid transparent; border-bottom: 5px solid #e2d6c2; border-radius: 14px; padding: 14px 8px; cursor: pointer; box-shadow: var(--shadow-sm); min-height: 54px; }
+.match__tile.is-sel { border-color: var(--gold); }
+.match__tile.is-matched { background: #d8f5e4; border-bottom-color: var(--green-500); color: var(--green-700); opacity: 0.8; }
+.match__tile.is-wrong { background: #ffe0e5; border-bottom-color: var(--danger); color: var(--danger); }
+
+/* Typing */
+.type { width: 100%; max-width: 340px; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 6px; }
+.type__meter { font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+.type__prompt { font-size: 80px; font-weight: 900; color: var(--green-900); line-height: 1; }
+.type__prompt--text { font-size: 40px; }
+.type__sub { font-size: 13px; color: var(--ink-soft); font-weight: 700; }
+.type__input { width: 100%; font: inherit; font-size: 22px; font-weight: 800; text-align: center; padding: 14px; border: 2.5px solid #e2d6c2; border-radius: 14px; background: #fff; color: var(--ink); }
+.type__input:focus { outline: none; border-color: var(--green-500); }
+.type__input.is-right { border-color: var(--green-500); background: #d8f5e4; }
+.type__input.is-wrong { border-color: var(--danger); background: #ffe0e5; }
+.type__answer { font-size: 14px; font-weight: 800; color: var(--danger); }

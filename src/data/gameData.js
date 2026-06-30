@@ -300,6 +300,46 @@ export function buildQuizSteps(lesson) {
   return shuffle([...kana, ...reverse, ...words])
 }
 
+// ── Practice decks ─────────────────────────────────────────────────────────
+// Practice draws from what the player has mastered (falls back to the starter
+// set so a brand-new player always has something to drill).
+function masteredKana(masteredChars) {
+  const pool = ALL_KANA.filter((k) => masteredChars.includes(k.char))
+  return pool.length ? pool : LESSONS[0].kana
+}
+function masteredWords(masteredChars) {
+  const pool = ALL_WORDS.filter((w) => [...w.kana].every((ch) => masteredChars.includes(ch)))
+  return pool.length ? pool : LESSONS[0].examples
+}
+
+// Steps for the Flashcards and Multiple-choice drills (runs through StageRunner).
+export function buildPracticeSteps(masteredChars, deck = 'kana', drill = 'choice', count = 10) {
+  if (deck === 'words') {
+    const pool = shuffle(masteredWords(masteredChars)).slice(0, count)
+    if (drill === 'flash') return pool.map((w) => flashStep(w.kana, w.romaji, w.meaning, true))
+    return pool.map((w, i) => (i % 2 ? qMeaningToWord(w) : qWordToMeaning(w)))
+  }
+  const pool = shuffle(masteredKana(masteredChars)).slice(0, count)
+  if (drill === 'flash') return pool.map((k) => flashStep(k.char, k.romaji, KANA_TIPS[k.char]))
+  return pool.map((k, i) => (i % 2 ? qRomajiToKana(k) : qKanaToRomaji(k)))
+}
+
+// Pairs for the Match-up drill: { id, left, right }.
+export function buildMatchPairs(masteredChars, deck = 'kana', count = 5) {
+  if (deck === 'words') {
+    return shuffle(masteredWords(masteredChars)).slice(0, count).map((w) => ({ id: w.kana, left: w.kana, right: w.meaning }))
+  }
+  return shuffle(masteredKana(masteredChars)).slice(0, count).map((k) => ({ id: k.char, left: k.char, right: k.romaji }))
+}
+
+// Items for the Typing drill: { id, prompt, answer } (answer is romaji).
+export function buildTypeDeck(masteredChars, deck = 'kana', count = 8) {
+  if (deck === 'words') {
+    return shuffle(masteredWords(masteredChars)).slice(0, count).map((w) => ({ id: w.kana, prompt: w.kana, answer: w.romaji, hint: w.meaning }))
+  }
+  return shuffle(masteredKana(masteredChars)).slice(0, count).map((k) => ({ id: k.char, prompt: k.char, answer: k.romaji }))
+}
+
 // Build a mixed boss gauntlet drawing from every kana in the forest.
 export function buildBossQuestions(count = 8) {
   const all = LESSONS.flatMap((l) => l.kana)

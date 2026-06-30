@@ -1,84 +1,130 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { buildPracticeQuestions } from '../data/gameData'
-import { useTransientState } from '../state/useTransientState'
+import { buildPracticeSteps, buildMatchPairs, buildTypeDeck } from '../data/gameData'
+import StageRunner from './StageRunner'
+import MatchGame from './MatchGame'
+import TypeDrill from './TypeDrill'
 import KikoCharacter from './KikoCharacter'
-import QuizCard from './QuizCard'
+import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
-//  PracticeScreen — endless free drill over the kana you've mastered.
-//  No node progression; just reps and instant feedback from Kiko.
+//  PracticeScreen — a practice hub. Pick a deck (Kana / Words) and a drill
+//  (Flashcards / Multiple choice / Match-up / Typing), then run it. Everything
+//  draws from what you've mastered, with a starter set for brand-new players.
 // ──────────────────────────────────────────────────────────────────────────
+const DRILLS = [
+  { id: 'flash', label: 'Flashcards', desc: 'Study one at a time', icon: 'book' },
+  { id: 'choice', label: 'Multiple choice', desc: 'Pick the right answer', icon: 'check' },
+  { id: 'match', label: 'Match-up', desc: 'Pair them up fast', icon: 'sparkle' },
+  { id: 'type', label: 'Typing', desc: 'Type the romaji', icon: 'study' },
+]
+
 export default function PracticeScreen({ masteredChars }) {
-  const [round, setRound] = useState(0)
-  const questions = useMemo(() => buildPracticeQuestions(masteredChars, 10), [masteredChars, round])
-  const total = questions.length
+  const [view, setView] = useState('hub') // hub | play | summary
+  const [deck, setDeck] = useState('kana')
+  const [drill, setDrill] = useState('choice')
+  const [session, setSession] = useState(0)
+  const [result, setResult] = useState(null)
 
-  const [qIndex, setQIndex] = useState(0)
-  const [chosen, setChosen] = useState(null)
-  const [locked, setLocked] = useState(false)
-  const [correct, setCorrect] = useState(0)
-  const [done, setDone] = useState(false)
-  const [kikoState, playKiko] = useTransientState('idle')
+  const data = useMemo(() => {
+    if (view !== 'play') return null
+    if (drill === 'match') return { pairs: buildMatchPairs(masteredChars, deck) }
+    if (drill === 'type') return { deck: buildTypeDeck(masteredChars, deck) }
+    return { steps: buildPracticeSteps(masteredChars, deck, drill, 10) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, drill, deck, session, masteredChars])
 
-  const restart = () => {
-    setRound((r) => r + 1)
-    setQIndex(0)
-    setChosen(null)
-    setLocked(false)
-    setCorrect(0)
-    setDone(false)
+  const start = () => {
+    setSession((s) => s + 1)
+    setView('play')
+  }
+  const finish = (r) => {
+    setResult({ ...r, drill })
+    setView('summary')
+  }
+  const again = () => {
+    setSession((s) => s + 1)
+    setView('play')
   }
 
-  const handleAnswer = (opt) => {
-    if (locked) return
-    setChosen(opt)
-    setLocked(true)
-    const isCorrect = opt === questions[qIndex].answer
-    if (isCorrect) setCorrect((c) => c + 1)
-    playKiko(isCorrect ? 'happy' : 'sad', 900)
-    setTimeout(() => {
-      if (qIndex + 1 < total) {
-        setQIndex((i) => i + 1)
-        setChosen(null)
-        setLocked(false)
-      } else {
-        setDone(true)
-      }
-    }, 1050)
-  }
+  // ── HUB ──
+  if (view === 'hub') {
+    return (
+      <div className="page practice-hub">
+        <h2 className="page__title">Practice</h2>
+        <p className="page__sub">Pick a deck, then how you want to drill</p>
 
-  return (
-    <div className="page practice-page">
-      <h2 className="page__title">Practice</h2>
-      <p className="page__sub">Free drill · {masteredChars.length > 0 ? 'your mastered kana' : 'starter kana'}</p>
-
-      <KikoCharacter state={kikoState} size={120} />
-
-      {!done ? (
-        <>
-          <div className="practice-meter">
-            {qIndex + 1} / {total} · {correct} correct
-          </div>
-          <QuizCard question={questions[qIndex]} chosen={chosen} locked={locked} onAnswer={handleAnswer} />
-        </>
-      ) : (
-        <motion.div
-          className="practice-summary"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-        >
-          <p className="practice-summary__score">
-            {correct} / {total}
-          </p>
-          <p className="practice-summary__label">
-            {correct === total ? 'Perfect run!' : 'Nice drilling — keep going!'}
-          </p>
-          <button className="btn btn--primary" onClick={restart}>
-            New Set →
+        <div className="deck-toggle">
+          <button className={`deck-toggle__btn ${deck === 'kana' ? 'is-on' : ''}`} onClick={() => setDeck('kana')}>
+            Kana
           </button>
-        </motion.div>
+          <button className={`deck-toggle__btn ${deck === 'words' ? 'is-on' : ''}`} onClick={() => setDeck('words')}>
+            Words
+          </button>
+        </div>
+
+        <div className="drill-grid">
+          {DRILLS.map((d) => (
+            <button
+              key={d.id}
+              className={`drill-card ${drill === d.id ? 'is-on' : ''}`}
+              onClick={() => setDrill(d.id)}
+            >
+              <span className="drill-card__icon">
+                <Icon name={d.icon} size={22} />
+              </span>
+              <span className="drill-card__label">{d.label}</span>
+              <span className="drill-card__desc">{d.desc}</span>
+            </button>
+          ))}
+        </div>
+
+        <button className="btn btn--primary practice-hub__start" onClick={start}>
+          Start practice →
+        </button>
+        <p className="practice-hub__note">More decks (sentences, phrases) coming soon</p>
+      </div>
+    )
+  }
+
+  // ── PLAY ──
+  if (view === 'play' && data) {
+    return (
+      <div className="page practice-play">
+        <button className="practice-play__back" onClick={() => setView('hub')} aria-label="Back to practice">
+          ‹ Practice
+        </button>
+        {drill === 'match' ? (
+          <MatchGame pairs={data.pairs} onDone={finish} />
+        ) : drill === 'type' ? (
+          <TypeDrill deck={data.deck} onDone={finish} />
+        ) : (
+          <StageRunner steps={data.steps} onDone={finish} />
+        )}
+      </div>
+    )
+  }
+
+  // ── SUMMARY ──
+  const scored = result && result.total > 0
+  const great = scored && result.correct / result.total >= 0.8
+  return (
+    <div className="page practice-done">
+      <KikoCharacter state={great ? 'victory' : 'happy'} size={130} />
+      <h2 className="page__title">{result?.drill === 'flash' ? 'Nice review!' : 'Set complete'}</h2>
+      {scored && (
+        <p className="practice-summary__score">
+          {result.correct} / {result.total}
+        </p>
       )}
+      <p className="page__sub">{great ? 'Sharp work — keep the streak going!' : 'Every rep makes it stick.'}</p>
+      <div className="stage-done__actions">
+        <button className="btn btn--primary" onClick={again}>
+          Again →
+        </button>
+        <button className="btn btn--ghost btn--sm" onClick={() => setView('hub')}>
+          Back to practice
+        </button>
+      </div>
     </div>
   )
 }
