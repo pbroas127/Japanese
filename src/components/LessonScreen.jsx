@@ -1,23 +1,34 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { buildQuiz, PASS_THRESHOLD, XP_LESSON_CLEAR, XP_PER_CORRECT } from '../data/gameData'
-import { useTransientState } from '../state/useTransientState'
+import {
+  buildLearnSteps,
+  buildUseSteps,
+  buildQuizSteps,
+  PASS_THRESHOLD,
+  XP_LESSON_CLEAR,
+  XP_PER_CORRECT,
+} from '../data/gameData'
 import KikoCharacter from './KikoCharacter'
-import QuizCard from './QuizCard'
 import ResultPanel from './ResultPanel'
+import StageRunner from './StageRunner'
 import StageDots from './StageDots'
 import TopHUD from './TopHUD'
 
 // ──────────────────────────────────────────────────────────────────────────
-//  LessonScreen — a 3-stage level:
-//    1 · Learn  — meet the kana (no scoring)
-//    2 · Use    — see them inside real words (no scoring)
-//    3 · Quiz   — graded recall; ≥ PASS_THRESHOLD clears the level
+//  LessonScreen — a 3-stage level, each stage a full interactive mini-lesson:
+//    1 · Learn — study cards + recognise the sound
+//    2 · Use   — study real words + match words ↔ meanings
+//    3 · Quiz  — graded mix of everything; ≥ PASS_THRESHOLD clears the level
 //
-//  Stages 1 & 2 are banked the moment you advance past them, so leaving before
-//  the quiz keeps your dots filled (2/3) and re-entering resumes at the quiz.
-//  Failing the quiz leaves the level at 2/3 — the node keeps flashing.
+//  Each stage ends on a completion screen → Next stage or Back to map. Stages
+//  bank the moment you finish them, so leaving keeps your dots. Failing the
+//  quiz offers Try again / Return to map and leaves the level at 2/3.
 // ──────────────────────────────────────────────────────────────────────────
+const bodyMotion = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -24 },
+}
 const STAGE_LABELS = ['Learn', 'Use', 'Quiz']
 
 export default function LessonScreen({
@@ -32,65 +43,53 @@ export default function LessonScreen({
   onFail,
   onExit,
 }) {
-  const quiz = useMemo(() => buildQuiz(lesson), [lesson])
-  const total = quiz.length
+  const learnSteps = useMemo(() => buildLearnSteps(lesson), [lesson])
+  const useSteps = useMemo(() => buildUseSteps(lesson), [lesson])
+  const [quizKey, setQuizKey] = useState(0)
+  const quizSteps = useMemo(() => buildQuizSteps(lesson), [lesson, quizKey])
 
   // Resume at the first unfinished stage.
   const startPhase = stagesDone >= 2 ? 'quiz' : stagesDone === 1 ? 'use' : 'learn'
-  const [phase, setPhase] = useState(startPhase) // learn | use | quiz | result
-  const [banked, setBanked] = useState(stagesDone) // live dot count for the header
-
-  const [qIndex, setQIndex] = useState(0)
-  const [chosen, setChosen] = useState(null)
-  const [locked, setLocked] = useState(false)
-  const [correctCount, setCorrectCount] = useState(0)
+  const [phase, setPhase] = useState(startPhase) // learn | use | quiz | stageDone | result
+  const [banked, setBanked] = useState(stagesDone)
+  const [inter, setInter] = useState(null) // stage-complete interstitial payload
   const [result, setResult] = useState(null)
-  const [kikoState, playKiko] = useTransientState('idle')
 
-  const question = quiz[qIndex]
+  const headerStage = phase === 'use' ? 2 : phase === 'quiz' ? 3 : 1
 
-  // Bank a non-quiz stage (1 = Learn, 2 = Use) and move on.
-  const advance = (stage, nextPhase) => {
-    onStage?.(node, stage)
-    setBanked((b) => Math.max(b, stage))
-    setPhase(nextPhase)
+  const finishLearn = (score) => {
+    onStage?.(node, 1)
+    setBanked((b) => Math.max(b, 1))
+    setInter({ title: 'Stage 1 complete', sub: 'You met the kana', score, next: 'use', nextLabel: 'Next: Use →' })
+    setPhase('stageDone')
   }
 
-  const finish = (finalCorrect) => {
-    const pass = finalCorrect / total >= PASS_THRESHOLD
-    if (pass) onPass(node, finalCorrect, total)
-    else onFail(node, finalCorrect, total)
+  const finishUse = (score) => {
+    onStage?.(node, 2)
+    setBanked((b) => Math.max(b, 2))
+    setInter({ title: 'Stage 2 complete', sub: 'You used them in words', score, next: 'quiz', nextLabel: 'Start Quiz →' })
+    setPhase('stageDone')
+  }
+
+  const finishQuiz = ({ correct, total }) => {
+    const pass = total ? correct / total >= PASS_THRESHOLD : true
+    if (pass) onPass(node, correct, total)
+    else onFail(node, correct, total)
     setResult({
       pass,
-      correct: finalCorrect,
+      correct,
       total,
-      xpGained: pass ? XP_LESSON_CLEAR + finalCorrect * XP_PER_CORRECT : 0,
+      xpGained: pass ? XP_LESSON_CLEAR + correct * XP_PER_CORRECT : 0,
       streak: pass ? streak + 1 : streak,
     })
     setPhase('result')
   }
 
-  const handleAnswer = (opt) => {
-    if (locked) return
-    setChosen(opt)
-    setLocked(true)
-    const isCorrect = opt === question.answer
-    const newCorrect = correctCount + (isCorrect ? 1 : 0)
-    setCorrectCount(newCorrect)
-    playKiko(isCorrect ? (streak >= 3 ? 'excited' : 'happy') : 'sad', 950)
-
-    setTimeout(() => {
-      if (qIndex + 1 < total) {
-        setQIndex((i) => i + 1)
-        setChosen(null)
-        setLocked(false)
-      } else {
-        finish(newCorrect)
-      }
-    }, 1150)
+  const retryQuiz = () => {
+    setResult(null)
+    setQuizKey((k) => k + 1)
+    setPhase('quiz')
   }
-
-  const stageIndex = phase === 'use' ? 1 : phase === 'quiz' ? 2 : 0
 
   return (
     <div className="screen lesson" style={{ '--accent': lesson.accent }}>
@@ -100,12 +99,13 @@ export default function LessonScreen({
         ‹ Map
       </button>
 
-      {/* Stage header — shows where you are + banked dots */}
       {phase !== 'result' && (
         <div className="lesson__stages">
           <StageDots done={banked} className="lesson__stages-dots" />
           <span className="lesson__stages-label">
-            Stage {stageIndex + 1} of 3 · {STAGE_LABELS[stageIndex]}
+            {phase === 'stageDone'
+              ? `${banked} of 3 stages done`
+              : `Stage ${headerStage} of 3 · ${STAGE_LABELS[headerStage - 1]}`}
           </span>
         </div>
       )}
@@ -113,99 +113,56 @@ export default function LessonScreen({
       <AnimatePresence mode="wait">
         {/* ── STAGE 1 · LEARN ── */}
         {phase === 'learn' && (
-          <motion.div
-            key="learn"
-            className="lesson__intro"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
-          >
+          <motion.div key="learn" className="lesson__stage-body" {...bodyMotion}>
             <h2 className="lesson__title">{lesson.title}</h2>
             <p className="lesson__subtitle">{lesson.subtitle}</p>
-
-            <div className="kana-grid">
-              {lesson.kana.map((k, i) => (
-                <motion.div
-                  className="kana-chip"
-                  key={k.char}
-                  initial={{ scale: 0, rotate: -10 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.05 * i, type: 'spring', stiffness: 240, damping: 16 }}
-                >
-                  <span className="kana-chip__char">{k.char}</span>
-                  <span className="kana-chip__romaji">{k.romaji}</span>
-                </motion.div>
-              ))}
-            </div>
-
-            <div className="lesson__kiko">
-              <KikoCharacter state={kikoState} size={120} />
-            </div>
-
-            <motion.button className="btn btn--primary" onClick={() => advance(1, 'use')} whileTap={{ scale: 0.95 }}>
-              Next: Use →
-            </motion.button>
+            <StageRunner steps={learnSteps} streak={streak} onDone={finishLearn} />
           </motion.div>
         )}
 
         {/* ── STAGE 2 · USE ── */}
         {phase === 'use' && (
-          <motion.div
-            key="use"
-            className="lesson__intro"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
-          >
+          <motion.div key="use" className="lesson__stage-body" {...bodyMotion}>
             <h2 className="lesson__title">Use it in words</h2>
-            <p className="lesson__subtitle">See your new kana inside real words</p>
-
-            <div className="examples">
-              {lesson.examples.map((ex) => (
-                <div className="example-row" key={ex.kana}>
-                  <span className="example-row__kana">{ex.kana}</span>
-                  <span className="example-row__romaji">{ex.romaji}</span>
-                  <span className="example-row__meaning">{ex.meaning}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="lesson__kiko">
-              <KikoCharacter state={kikoState} size={120} />
-            </div>
-
-            <motion.button className="btn btn--primary" onClick={() => advance(2, 'quiz')} whileTap={{ scale: 0.95 }}>
-              Start Quiz →
-            </motion.button>
+            <p className="lesson__subtitle">Your new kana inside real words</p>
+            <StageRunner steps={useSteps} streak={streak} onDone={finishUse} />
           </motion.div>
         )}
 
         {/* ── STAGE 3 · QUIZ ── */}
         {phase === 'quiz' && (
-          <motion.div
-            key="quiz"
-            className="lesson__quiz"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
-          >
-            <div className="lesson__progress">
-              {quiz.map((q, i) => (
-                <span
-                  key={q.id}
-                  className={`pip ${i < qIndex ? 'is-done' : ''} ${i === qIndex ? 'is-active' : ''}`}
-                />
-              ))}
+          <motion.div key={`quiz-${quizKey}`} className="lesson__stage-body" {...bodyMotion}>
+            <h2 className="lesson__title">Quiz</h2>
+            <p className="lesson__subtitle">Everything you just learned</p>
+            <StageRunner steps={quizSteps} streak={streak} onDone={finishQuiz} />
+          </motion.div>
+        )}
+
+        {/* ── STAGE COMPLETE (Learn / Use) ── */}
+        {phase === 'stageDone' && inter && (
+          <motion.div key="stageDone" className="stage-done" {...bodyMotion}>
+            <KikoCharacter state="excited" size={150} shadow={false} />
+            <h2 className="stage-done__title">{inter.title}</h2>
+            <p className="stage-done__sub">{inter.sub}</p>
+            {inter.score && inter.score.total > 0 && (
+              <p className="stage-done__score">
+                {inter.score.correct} / {inter.score.total} correct
+              </p>
+            )}
+            <StageDots done={banked} className="stage-done__dots" />
+            <div className="stage-done__actions">
+              <motion.button className="btn btn--primary" onClick={() => setPhase(inter.next)} whileTap={{ scale: 0.95 }}>
+                {inter.nextLabel}
+              </motion.button>
+              <button className="btn btn--ghost btn--sm" onClick={onExit}>
+                Back to map
+              </button>
             </div>
-
-            <KikoCharacter state={kikoState} size={120} />
-
-            <QuizCard question={question} chosen={chosen} locked={locked} onAnswer={handleAnswer} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── RESULT ── */}
+      {/* ── RESULT (quiz) ── */}
       <AnimatePresence>
         {phase === 'result' && result && (
           <ResultPanel
@@ -215,6 +172,7 @@ export default function LessonScreen({
             xpGained={result.xpGained}
             streak={result.streak}
             onContinue={onExit}
+            onRetry={result.pass ? null : retryQuiz}
           />
         )}
       </AnimatePresence>

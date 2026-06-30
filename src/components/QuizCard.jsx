@@ -5,13 +5,13 @@ import { motion } from 'framer-motion'
 //  After an answer, the chosen + correct options are highlighted, then the
 //  parent advances. `locked` prevents double-answering during feedback.
 // ──────────────────────────────────────────────────────────────────────────
-export default function QuizCard({ question, chosen, locked, onAnswer, prompt = 'kana' }) {
+export default function QuizCard({ question, chosen, locked, onAnswer, prompt = 'kana', hint }) {
   return (
     <div className="quiz">
-      <p className="quiz__hint">{prompt === 'kana' ? 'Which sound is this?' : 'Pick the kana'}</p>
+      <p className="quiz__hint">{hint || (prompt === 'kana' ? 'Which sound is this?' : 'Pick the kana')}</p>
 
       <motion.div
-        className="quiz__prompt"
+        className={`quiz__prompt ${/[぀-ヿ]/.test(question.prompt) ? '' : 'quiz__prompt--text'}`}
         key={question.id}
         initial={{ scale: 0.6, opacity: 0, rotate: -6 }}
         animate={{ scale: 1, opacity: 1, rotate: 0 }}

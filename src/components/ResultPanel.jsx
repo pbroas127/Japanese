@@ -13,6 +13,7 @@ export default function ResultPanel({
   xpGained,
   streak,
   onContinue,
+  onRetry,
   continueLabel = 'Back to map',
 }) {
   return (
@@ -56,13 +57,20 @@ export default function ResultPanel({
           </div>
         </div>
 
-        <motion.button
-          className="btn btn--primary"
-          onClick={onContinue}
-          whileTap={{ scale: 0.95 }}
-        >
-          {continueLabel}
-        </motion.button>
+        <div className="result-panel__actions">
+          {!pass && onRetry && (
+            <motion.button className="btn btn--primary" onClick={onRetry} whileTap={{ scale: 0.95 }}>
+              Try again
+            </motion.button>
+          )}
+          <motion.button
+            className={`btn ${pass || !onRetry ? 'btn--primary' : 'btn--ghost'}`}
+            onClick={onContinue}
+            whileTap={{ scale: 0.95 }}
+          >
+            {pass ? continueLabel : 'Return to map'}
+          </motion.button>
+        </div>
       </motion.div>
     </motion.div>
   )
