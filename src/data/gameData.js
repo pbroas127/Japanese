@@ -123,7 +123,7 @@ export const WORLD = {
   // Kiko's permanent home: a dirt clearing off the path. She never moves from
   // here; only her pose/expression changes with the player's progress.
   // (Placed via the in-app layout editor.)
-  kikoHome: { x: 24.7, y: 18.2 },
+  kikoHome: { x: 24.7, y: 17.5 },
   // Hand-tuned dotted trail (waypoints in % of the scene) tracing the painted
   // dirt path. Authored in the in-app layout editor.
   path: [
