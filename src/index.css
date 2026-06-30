@@ -351,7 +351,7 @@ img { -webkit-user-drag: none; }
 .stage-dot.is-filled { fill: var(--green-500); stroke: #2f6d46; filter: drop-shadow(0 0 3px rgba(95,191,140,0.95)); }
 
 /* Under a world-map node */
-.node__dots { position: absolute; top: 100%; left: 50%; width: 38px; margin-left: -19px; margin-top: 4px; pointer-events: none; z-index: 7; }
+.node__dots { position: absolute; top: 100%; left: 50%; width: 38px; margin-left: -19px; margin-top: 2px; pointer-events: none; z-index: 7; }
 .node--boss .node__dots { display: none; }
 
 /* In the lesson stage header */
