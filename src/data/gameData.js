@@ -3,7 +3,7 @@
 //  Single world MVP. All hiragana content lives here.
 // ──────────────────────────────────────────────────────────────────────────
 
-import { isDue, overdueScore } from '../utils/srs'
+import { VOCAB } from './vocab'
 
 // Full romaji pool used to build quiz distractors.
 export const ROMAJI_POOL = [
@@ -323,9 +323,33 @@ export function buildQuizSteps(lesson) {
   return shuffle([...kana, ...reverse, ...words])
 }
 
+// ── Vocabulary (frequency pack) ──────────────────────────────────────────────
+// Words unlock ~20 per level (survival set first), so practice/review grows
+// with the player instead of dumping all 200 at once.
+export function vocabUnlockedFor(level) {
+  return Math.min(VOCAB.length, Math.max(1, level) * 20)
+}
+function unlockedVocab(vocabUnlocked) {
+  return VOCAB.slice(0, vocabUnlocked > 0 ? vocabUnlocked : VOCAB.length)
+}
+
+// Vocab question builders (item key `v:<id>`). Distractors stay readable —
+// we never ask the learner to pick an unreadable kanji, only meanings/readings.
+function qVocabRecognise(v) {
+  // word → meaning (reading shown as a hint)
+  const distractors = shuffle(VOCAB.filter((x) => x.en !== v.en)).slice(0, 3).map((x) => x.en)
+  return choiceStep(v.jp, v.en, [v.en, ...distractors], `${v.romaji} — what does it mean?`, `v:${v.id}`)
+}
+function qVocabReading(v) {
+  // meaning → reading
+  const distractors = shuffle(VOCAB.filter((x) => x.romaji !== v.romaji)).slice(0, 3).map((x) => x.romaji)
+  return choiceStep(v.en, v.romaji, [v.romaji, ...distractors], 'Pick the reading', `v:${v.id}`)
+}
+
 // ── Practice decks ─────────────────────────────────────────────────────────
-// Practice draws from what the player has mastered (falls back to the starter
-// set so a brand-new player always has something to drill).
+// Kana practice draws from what the player has mastered (falls back to the
+// starter set so a brand-new player always has something to drill). Word
+// practice draws from the unlocked vocabulary pack.
 function masteredKana(masteredChars) {
   const pool = ALL_KANA.filter((k) => masteredChars.includes(k.char))
   return pool.length ? pool : LESSONS[0].kana
@@ -336,11 +360,11 @@ function masteredWords(masteredChars) {
 }
 
 // Steps for the Flashcards and Multiple-choice drills (runs through StageRunner).
-export function buildPracticeSteps(masteredChars, deck = 'kana', drill = 'choice', count = 10) {
+export function buildPracticeSteps(masteredChars, deck = 'kana', drill = 'choice', count = 10, vocabUnlocked = 0) {
   if (deck === 'words') {
-    const pool = shuffle(masteredWords(masteredChars)).slice(0, count)
-    if (drill === 'flash') return pool.map((w) => flashStep(w.kana, w.romaji, w.meaning, true))
-    return pool.map((w, i) => (i % 2 ? qMeaningToWord(w) : qWordToMeaning(w)))
+    const pool = shuffle(unlockedVocab(vocabUnlocked)).slice(0, count)
+    if (drill === 'flash') return pool.map((v) => flashStep(v.jp, v.romaji, v.en, true))
+    return pool.map((v, i) => (i % 2 ? qVocabReading(v) : qVocabRecognise(v)))
   }
   const pool = shuffle(masteredKana(masteredChars)).slice(0, count)
   if (drill === 'flash') return pool.map((k) => flashStep(k.char, k.romaji, KANA_TIPS[k.char]))
@@ -348,57 +372,60 @@ export function buildPracticeSteps(masteredChars, deck = 'kana', drill = 'choice
 }
 
 // Pairs for the Match-up drill: { id, left, right }.
-export function buildMatchPairs(masteredChars, deck = 'kana', count = 5) {
+export function buildMatchPairs(masteredChars, deck = 'kana', count = 5, vocabUnlocked = 0) {
   if (deck === 'words') {
-    return shuffle(masteredWords(masteredChars)).slice(0, count).map((w) => ({ id: w.kana, left: w.kana, right: w.meaning }))
+    return shuffle(unlockedVocab(vocabUnlocked)).slice(0, count).map((v) => ({ id: `v:${v.id}`, left: v.jp, right: v.en }))
   }
   return shuffle(masteredKana(masteredChars)).slice(0, count).map((k) => ({ id: k.char, left: k.char, right: k.romaji }))
 }
 
 // Items for the Typing drill: { id, prompt, answer } (answer is romaji).
-export function buildTypeDeck(masteredChars, deck = 'kana', count = 8) {
+export function buildTypeDeck(masteredChars, deck = 'kana', count = 8, vocabUnlocked = 0) {
   if (deck === 'words') {
-    return shuffle(masteredWords(masteredChars)).slice(0, count).map((w) => ({ id: w.kana, prompt: w.kana, answer: w.romaji, hint: w.meaning }))
+    return shuffle(unlockedVocab(vocabUnlocked)).slice(0, count).map((v) => ({ id: `v:${v.id}`, prompt: v.jp, answer: v.romaji, hint: v.en }))
   }
   return shuffle(masteredKana(masteredChars)).slice(0, count).map((k) => ({ id: k.char, prompt: k.char, answer: k.romaji }))
 }
 
 // ── Spaced-repetition review ────────────────────────────────────────────────
-// Strict pools (no starter fallback) — review only covers what you've actually
-// mastered, so a brand-new player has nothing "due" yet.
-function reviewItems(masteredChars) {
+// Review covers mastered kana, the hiragana words from cleared lessons, and the
+// unlocked vocabulary — so a brand-new player has little/nothing "due" yet.
+function reviewItems(masteredChars, vocabUnlocked = 0) {
   const kana = ALL_KANA.filter((k) => masteredChars.includes(k.char)).map((k) => ({ key: `k:${k.char}`, kind: 'kana', data: k }))
   const words = ALL_WORDS.filter((w) => [...w.kana].every((ch) => masteredChars.includes(ch))).map((w) => ({ key: `w:${w.kana}`, kind: 'word', data: w }))
-  return [...kana, ...words]
+  const vocab = unlockedVocab(vocabUnlocked).map((v) => ({ key: `v:${v.id}`, kind: 'vocab', data: v }))
+  return [...kana, ...words, ...vocab]
 }
 
-// How many mastered items are currently due for review.
-export function countDueItems(srs = {}, masteredChars = []) {
-  const now = Date.now()
-  return reviewItems(masteredChars).filter((it) => isDue(srs[it.key], now)).length
+function reviewQuestion(it) {
+  if (it.kind === 'kana') return Math.random() < 0.5 ? qKanaToRomaji(it.data) : qRomajiToKana(it.data)
+  if (it.kind === 'word') return Math.random() < 0.5 ? qWordToMeaning(it.data) : qMeaningToWord(it.data)
+  return Math.random() < 0.5 ? qVocabRecognise(it.data) : qVocabReading(it.data)
 }
 
-// Build a review session: due / most-overdue items first, topped up with the
-// rest if fewer than `count` are due. Each item becomes a multiple-choice step.
-export function buildReviewSteps(srs = {}, masteredChars = [], count = 12) {
+// "Due" means seen before and now past its review date — i.e. genuine review
+// load. Never-seen items are "new", not due, so they don't flood the badge.
+export function countDueItems(srs = {}, masteredChars = [], vocabUnlocked = 0) {
   const now = Date.now()
-  const all = reviewItems(masteredChars)
-  const due = all.filter((it) => isDue(srs[it.key], now))
-  due.sort((a, b) => overdueScore(srs[b.key], now) - overdueScore(srs[a.key], now))
-  let picked = due.slice(0, count)
-  if (picked.length < count) {
-    const pickedKeys = new Set(picked.map((it) => it.key))
-    picked = [...picked, ...shuffle(all.filter((it) => !pickedKeys.has(it.key)))].slice(0, count)
-  }
-  return picked.map((it) =>
-    it.kind === 'kana'
-      ? Math.random() < 0.5
-        ? qKanaToRomaji(it.data)
-        : qRomajiToKana(it.data)
-      : Math.random() < 0.5
-        ? qWordToMeaning(it.data)
-        : qMeaningToWord(it.data),
-  )
+  return reviewItems(masteredChars, vocabUnlocked).filter((it) => {
+    const card = srs[it.key]
+    return card && card.due <= now
+  }).length
+}
+
+// Build a review session, ordered: most-overdue (seen) first, then new items,
+// then upcoming ones to top up to `count`. Each becomes a multiple-choice step.
+export function buildReviewSteps(srs = {}, masteredChars = [], count = 12, vocabUnlocked = 0) {
+  const now = Date.now()
+  const all = reviewItems(masteredChars, vocabUnlocked)
+  const overdue = all
+    .filter((it) => srs[it.key] && srs[it.key].due <= now)
+    .sort((a, b) => srs[a.key].due - srs[b.key].due) // longest overdue first
+  const fresh = shuffle(all.filter((it) => !srs[it.key]))
+  const upcoming = all
+    .filter((it) => srs[it.key] && srs[it.key].due > now)
+    .sort((a, b) => srs[a.key].due - srs[b.key].due)
+  return [...overdue, ...fresh, ...upcoming].slice(0, count).map(reviewQuestion)
 }
 
 // Build a mixed boss gauntlet drawing from every kana in the forest.

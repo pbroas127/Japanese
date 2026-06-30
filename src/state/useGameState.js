@@ -5,6 +5,7 @@ import {
   getLesson,
   crossedMilestone,
   levelFromXp,
+  vocabUnlockedFor,
   TOTAL_KANA,
   XP_LESSON_CLEAR,
   XP_BOSS_CLEAR,
@@ -259,6 +260,7 @@ export function useGameState() {
     const { stats } = state
     return {
       level: levelFromXp(state.xp),
+      vocabUnlocked: vocabUnlockedFor(levelFromXp(state.xp)),
       worldComplete: state.completed.includes('boss'),
       streakActiveToday: state.lastActive === todayStr(),
       accuracy: stats.totalQuestions ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0,

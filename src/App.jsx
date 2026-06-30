@@ -98,7 +98,12 @@ export default function App() {
                     )}
                     {tab === 'learn' && <LearnScreen getStatus={game.getStatus} onSelectNode={openNode} />}
                     {tab === 'practice' && (
-                      <PracticeScreen masteredChars={game.stats.kana} srs={game.srs} onReview={game.recordReview} />
+                      <PracticeScreen
+                        masteredChars={game.stats.kana}
+                        srs={game.srs}
+                        vocabUnlocked={game.vocabUnlocked}
+                        onReview={game.recordReview}
+                      />
                     )}
                     {tab === 'progress' && <ProgressPage game={game} />}
                     {tab === 'settings' && <SettingsPage game={game} />}

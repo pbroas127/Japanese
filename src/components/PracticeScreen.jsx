@@ -22,21 +22,24 @@ const DRILLS = [
   { id: 'type', label: 'Typing', desc: 'Type the romaji', icon: 'study' },
 ]
 
-export default function PracticeScreen({ masteredChars, srs = {}, onReview }) {
+export default function PracticeScreen({ masteredChars, srs = {}, vocabUnlocked = 0, onReview }) {
   const [view, setView] = useState('hub') // hub | play | summary
   const [deck, setDeck] = useState('kana')
   const [drill, setDrill] = useState('choice')
   const [playData, setPlayData] = useState(null)
   const [result, setResult] = useState(null)
 
-  const dueCount = useMemo(() => countDueItems(srs, masteredChars), [srs, masteredChars])
+  const dueCount = useMemo(
+    () => countDueItems(srs, masteredChars, vocabUnlocked),
+    [srs, masteredChars, vocabUnlocked],
+  )
 
   // Build a session's content once, at start (uses the latest srs snapshot).
   const buildData = (d) => {
-    if (d === 'review') return { steps: buildReviewSteps(srs, masteredChars, 12) }
-    if (d === 'match') return { pairs: buildMatchPairs(masteredChars, deck) }
-    if (d === 'type') return { deck: buildTypeDeck(masteredChars, deck) }
-    return { steps: buildPracticeSteps(masteredChars, deck, d, 10) }
+    if (d === 'review') return { steps: buildReviewSteps(srs, masteredChars, 12, vocabUnlocked) }
+    if (d === 'match') return { pairs: buildMatchPairs(masteredChars, deck, 5, vocabUnlocked) }
+    if (d === 'type') return { deck: buildTypeDeck(masteredChars, deck, 8, vocabUnlocked) }
+    return { steps: buildPracticeSteps(masteredChars, deck, d, 10, vocabUnlocked) }
   }
 
   const start = () => {
@@ -68,18 +71,14 @@ export default function PracticeScreen({ masteredChars, srs = {}, onReview }) {
         <h2 className="page__title">Practice</h2>
         <p className="page__sub">Pick a deck, then how you want to drill</p>
 
-        <button className="review-cta" onClick={startReview} disabled={masteredChars.length === 0}>
+        <button className="review-cta" onClick={startReview}>
           <span className="review-cta__icon">
             <Icon name="sparkle" size={22} />
           </span>
           <span className="review-cta__text">
             <span className="review-cta__title">Daily Review</span>
             <span className="review-cta__sub">
-              {masteredChars.length === 0
-                ? 'Clear a lesson to unlock'
-                : dueCount > 0
-                  ? `${dueCount} due now`
-                  : 'All caught up — review anyway'}
+              {dueCount > 0 ? `${dueCount} due now` : 'Smart mix — learn & review'}
             </span>
           </span>
           {dueCount > 0 && <span className="review-cta__badge">{dueCount}</span>}
