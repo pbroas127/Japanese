@@ -32,9 +32,9 @@ export const BOSS_ASSETS = {
 }
 export const BOSS_FALLBACK = '/assets/boss/idle.svg'
 
-// ── World background ──
+// ── World background ── (isolated-glade forest, generation 00ea7d7c)
 export const WORLD_ASSETS = {
-  background: `${CDN}/hf_20260629_174130_28cfc407-16d5-4e1b-8442-4997b959c5b9.png`,
+  background: `${CDN}/hf_20260629_221103_00ea7d7c-539d-4bfe-a342-0474c52412f4.png`,
 }
 export const WORLD_FALLBACK = {
   background: '/assets/world/forest-bg.svg',

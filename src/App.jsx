@@ -11,6 +11,7 @@ import ProgressPage from './components/ProgressPage'
 import SettingsPage from './components/SettingsPage'
 import LessonScreen from './components/LessonScreen'
 import BossFight from './components/BossFight'
+import MapEditor from './components/MapEditor'
 
 const pageMotion = {
   initial: { opacity: 0, y: 12 },
@@ -23,6 +24,7 @@ export default function App() {
   const game = useGameState()
   const [tab, setTab] = useState('map')
   const [overlay, setOverlay] = useState(null) // { type:'lesson'|'boss', nodeId }
+  const [editing, setEditing] = useState(false)
 
   const openNode = (node) => setOverlay({ type: node.type === 'boss' ? 'boss' : 'lesson', nodeId: node.id })
   const closeOverlay = () => setOverlay(null)
@@ -98,8 +100,16 @@ export default function App() {
               </main>
 
               <BottomNav active={tab} onChange={setTab} />
+
+              {tab === 'map' && (
+                <button className="edit-fab" onClick={() => setEditing(true)}>
+                  Edit Layout
+                </button>
+              )}
             </div>
           )}
+
+          {editing && <MapEditor onExit={() => setEditing(false)} />}
         </div>
       </div>
     </MotionConfig>
