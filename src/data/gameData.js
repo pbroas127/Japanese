@@ -32,6 +32,8 @@ export const LESSONS = [
       { kana: 'あい', romaji: 'ai', meaning: 'love' },
       { kana: 'いえ', romaji: 'ie', meaning: 'house' },
       { kana: 'うえ', romaji: 'ue', meaning: 'above' },
+      { kana: 'あお', romaji: 'ao', meaning: 'blue' },
+      { kana: 'あう', romaji: 'au', meaning: 'to meet' },
     ],
   },
   {
@@ -50,6 +52,8 @@ export const LESSONS = [
       { kana: 'かお', romaji: 'kao', meaning: 'face' },
       { kana: 'こえ', romaji: 'koe', meaning: 'voice' },
       { kana: 'いけ', romaji: 'ike', meaning: 'pond' },
+      { kana: 'えき', romaji: 'eki', meaning: 'station' },
+      { kana: 'あき', romaji: 'aki', meaning: 'autumn' },
     ],
   },
   {
@@ -66,8 +70,10 @@ export const LESSONS = [
     ],
     examples: [
       { kana: 'すし', romaji: 'sushi', meaning: 'sushi' },
-      { kana: 'さけ', romaji: 'sake', meaning: 'salmon / sake' },
       { kana: 'あさ', romaji: 'asa', meaning: 'morning' },
+      { kana: 'いす', romaji: 'isu', meaning: 'chair' },
+      { kana: 'かさ', romaji: 'kasa', meaning: 'umbrella' },
+      { kana: 'すき', romaji: 'suki', meaning: 'to like' },
     ],
   },
   {
@@ -86,6 +92,8 @@ export const LESSONS = [
       { kana: 'たこ', romaji: 'tako', meaning: 'octopus' },
       { kana: 'つき', romaji: 'tsuki', meaning: 'moon' },
       { kana: 'いと', romaji: 'ito', meaning: 'thread' },
+      { kana: 'くつ', romaji: 'kutsu', meaning: 'shoes' },
+      { kana: 'とけい', romaji: 'tokei', meaning: 'clock' },
     ],
   },
   {
@@ -101,9 +109,11 @@ export const LESSONS = [
       { char: 'の', romaji: 'no' },
     ],
     examples: [
-      { kana: 'なに', romaji: 'nani', meaning: 'what' },
       { kana: 'ねこ', romaji: 'neko', meaning: 'cat' },
       { kana: 'いぬ', romaji: 'inu', meaning: 'dog' },
+      { kana: 'なに', romaji: 'nani', meaning: 'what' },
+      { kana: 'にく', romaji: 'niku', meaning: 'meat' },
+      { kana: 'さかな', romaji: 'sakana', meaning: 'fish' },
     ],
   },
 ]

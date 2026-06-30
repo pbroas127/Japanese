@@ -11,6 +11,7 @@ export default function ResultPanel({
   correct,
   total,
   xpGained,
+  petalsGained = 0,
   streak,
   onContinue,
   onRetry,
@@ -49,6 +50,19 @@ export default function ResultPanel({
             <span className="result-stat__value">+{xpGained}</span>
             <span className="result-stat__label">XP</span>
           </div>
+          {petalsGained > 0 && (
+            <motion.div
+              className="result-stat"
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 240, damping: 16, delay: 0.3 }}
+            >
+              <span className="result-stat__value result-stat__value--petals">
+                +{petalsGained} <Icon name="petal" size={15} />
+              </span>
+              <span className="result-stat__label">Petals</span>
+            </motion.div>
+          )}
           <div className="result-stat">
             <span className="result-stat__value result-stat__value--streak">
               {streak} <Icon name="flame" size={16} />

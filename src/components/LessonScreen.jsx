@@ -7,11 +7,15 @@ import {
   PASS_THRESHOLD,
   XP_LESSON_CLEAR,
   XP_PER_CORRECT,
+  PETALS_LESSON_CLEAR,
+  PETALS_PER_CORRECT,
+  PETALS_PER_STAGE,
 } from '../data/gameData'
 import KikoCharacter from './KikoCharacter'
 import ResultPanel from './ResultPanel'
 import StageRunner from './StageRunner'
 import StageDots from './StageDots'
+import Icon from './Icon'
 import TopHUD from './TopHUD'
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -83,6 +87,7 @@ export default function LessonScreen({
       correct,
       total,
       xpGained: pass ? XP_LESSON_CLEAR + correct * XP_PER_CORRECT : 0,
+      petalsGained: pass ? PETALS_LESSON_CLEAR + correct * PETALS_PER_CORRECT : 0,
       streak: pass && !streakActiveToday ? streak + 1 : streak,
     })
     setPhase('result')
@@ -152,6 +157,14 @@ export default function LessonScreen({
                 {inter.score.correct} / {inter.score.total} correct
               </p>
             )}
+            <motion.div
+              className="reward-pop"
+              initial={{ scale: 0, y: 8 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 15, delay: 0.25 }}
+            >
+              <Icon name="petal" size={17} /> +{PETALS_PER_STAGE} petals
+            </motion.div>
             <StageDots done={banked} className="stage-done__dots" />
             <div className="stage-done__actions">
               <motion.button className="btn btn--primary" onClick={() => setPhase(inter.next)} whileTap={{ scale: 0.95 }}>
@@ -173,6 +186,7 @@ export default function LessonScreen({
             correct={result.correct}
             total={result.total}
             xpGained={result.xpGained}
+            petalsGained={result.petalsGained}
             streak={result.streak}
             onContinue={onExit}
             onRetry={result.pass ? null : retryQuiz}

@@ -296,9 +296,13 @@ img { -webkit-user-drag: none; }
 .result-panel.is-fail .result-panel__title { color: var(--danger); }
 .result-panel__sub { font-size: 14px; color: var(--ink-soft); margin: 6px 0 14px; }
 .result-panel__stats { display: flex; gap: 10px; width: 100%; margin-bottom: 18px; }
-.result-stat { flex: 1; background: #fff; border-radius: 14px; padding: 10px 4px; box-shadow: var(--shadow-sm); }
-.result-stat__value { display: block; font-size: 20px; font-weight: 900; color: var(--green-700); }
-.result-stat__label { font-size: 11px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.5px; }
+.result-stat { flex: 1; background: #fff; border-radius: 14px; padding: 10px 3px; box-shadow: var(--shadow-sm); }
+.result-stat__value { display: block; font-size: 18px; font-weight: 900; color: var(--green-700); }
+.result-stat__value--petals { display: inline-flex; align-items: center; justify-content: center; gap: 2px; color: #c4477f; }
+.result-stat__label { font-size: 10.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.4px; }
+
+/* Animated petal reward (stage-complete screen) */
+.reward-pop { display: inline-flex; align-items: center; gap: 5px; background: #fff0f6; color: #c4477f; font-weight: 900; font-size: 15px; padding: 6px 15px; border-radius: 999px; box-shadow: var(--shadow-sm); }
 
 /* ── Boss fight ────────────────────────────────────────────────────────── */
 .boss { background: linear-gradient(180deg, #3a2c5a 0%, #241b3d 100%); overflow: hidden; }
