@@ -157,7 +157,7 @@ img { -webkit-user-drag: none; }
 .bubble {
   position: relative; max-width: 130px; background: #fff; color: var(--ink);
   font-size: 10.5px; font-weight: 700; line-height: 1.2; text-align: center;
-  padding: 6px 9px; border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: -4px;
+  padding: 6px 9px; border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: -6px;
 }
 .bubble__tail { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
   width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 7px solid #fff; }
