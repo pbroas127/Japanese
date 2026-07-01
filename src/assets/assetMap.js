@@ -9,6 +9,24 @@
 
 const CDN = 'https://d8j0ntlcm91z4.cloudfront.net/user_3DIHRL4hfIamgJ8ncr9DUxS5zcC'
 
+// ── Raster UI icons (nav bar, currency, streak flame) — transparent PNGs.
+// Settings deliberately keeps the hand-drawn vector gear from Icon.jsx.
+export const NAV_ICON_ASSETS = {
+  map: `${CDN}/hf_20260701_121436_2f5197cc-c686-41c6-a9ad-a702bb61a61f.png`,
+  learn: `${CDN}/hf_20260701_121441_0fcd29f1-41ef-445d-8615-0f2a51989634.png`,
+  practice: `${CDN}/hf_20260701_121445_624c064e-05a9-49bf-92ee-cb2470614764.png`,
+  progress: `${CDN}/hf_20260701_121450_b2c202c1-7c41-4500-9c3c-ec5fa9058cb9.png`,
+}
+export const UI_ICON_ASSETS = {
+  petal: `${CDN}/hf_20260701_121501_48d5d2c8-65d7-4fd9-bfc3-4502a4433225.png`,
+  freeze: `${CDN}/hf_20260701_121507_93dd1b14-8622-47a5-8a86-3946ca87f2ed.png`,
+  profile: `${CDN}/hf_20260701_121512_e656dcd4-b1d9-4824-b6c7-57b231ea3f16.png`,
+}
+export const STREAK_FLAME_ASSETS = {
+  lit: `${CDN}/hf_20260701_121453_9faec825-0569-4ec5-9bc5-240e01198a94.png`,
+  unlit: `${CDN}/hf_20260701_121457_524e2840-c966-47e8-9af0-fee14f2ec3fb.png`,
+}
+
 // ── Kiko (6 core + 4 contextual poses) ──
 export const KIKO_ASSETS = {
   idle: `${CDN}/hf_20260629_174406_a0f62737-61dd-49e4-a705-eacddb9a825d.png`,

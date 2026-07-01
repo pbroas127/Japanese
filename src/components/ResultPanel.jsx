@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import KikoCharacter from './KikoCharacter'
 import Icon from './Icon'
+import StreakFlame from './StreakFlame'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  ResultPanel — shown after a lesson (and after the boss).
@@ -65,7 +66,7 @@ export default function ResultPanel({
           )}
           <div className="result-stat">
             <span className="result-stat__value result-stat__value--streak">
-              {streak} <Icon name="flame" size={16} />
+              {streak} <StreakFlame lit={streak > 0} size={16} />
             </span>
             <span className="result-stat__label">Day streak</span>
           </div>

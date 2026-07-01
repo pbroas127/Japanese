@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FREEZE_COST } from '../data/gameData'
 import Icon from './Icon'
+import StreakFlame from './StreakFlame'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  StreakPage — opened from the flame in the HUD. Shows the daily streak, a
@@ -78,7 +79,7 @@ export default function StreakPage({ game, onClose }) {
         transition={{ type: 'spring', stiffness: 200, damping: 16 }}
       >
         <span className="streak-hero__flame">
-          <Icon name="flame" size={54} />
+          <StreakFlame lit={streak > 0} size={54} />
         </span>
         <span className="streak-hero__num">{streak}</span>
         <span className="streak-hero__label">day streak</span>
@@ -160,7 +161,7 @@ export default function StreakPage({ game, onClose }) {
                 key={ds}
                 className={`cal__cell ${done ? 'is-done' : ''} ${frozen ? 'is-frozen' : ''} ${isToday ? 'is-today' : ''}`}
               >
-                {done ? <Icon name="flame" size={15} /> : frozen ? <Icon name="freeze" size={14} /> : d}
+                {done ? <StreakFlame lit size={15} /> : frozen ? <Icon name="freeze" size={14} /> : d}
               </span>
             )
           })}

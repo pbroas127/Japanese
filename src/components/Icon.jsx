@@ -1,7 +1,17 @@
+import { useState } from 'react'
+import { NAV_ICON_ASSETS, UI_ICON_ASSETS } from '../assets/assetMap'
+
 // ──────────────────────────────────────────────────────────────────────────
 //  Icon — a single inline-SVG icon set (no emojis, transparent, inherits
 //  currentColor). Line icons by default; a few are solid-filled.
+//
+//  A few names (nav bar + currency icons) have real Higgsfield-generated
+//  raster art in RASTER below; those render an <img> instead, falling back to
+//  the vector body here if the image ever fails to load. Settings keeps the
+//  hand-drawn vector gear on purpose — never given raster art.
 // ──────────────────────────────────────────────────────────────────────────
+const RASTER = { ...NAV_ICON_ASSETS, ...UI_ICON_ASSETS }
+
 const SOLID = new Set(['flame', 'petal', 'star', 'sparkle', 'tree', 'play', 'fox', 'settings', 'heart'])
 
 const BODY = {
@@ -112,6 +122,24 @@ const BODY = {
 }
 
 export default function Icon({ name, size = 24, className = '', strokeWidth }) {
+  const [rasterFailed, setRasterFailed] = useState(false)
+  const rasterSrc = RASTER[name]
+
+  if (rasterSrc && !rasterFailed) {
+    return (
+      <img
+        className={`icon icon--${name} icon--raster ${className}`}
+        src={rasterSrc}
+        width={size}
+        height={size}
+        style={{ width: size, height: size, objectFit: 'contain' }}
+        alt=""
+        draggable={false}
+        onError={() => setRasterFailed(true)}
+      />
+    )
+  }
+
   const solid = SOLID.has(name)
   const body = BODY[name] || BODY.star
   return (

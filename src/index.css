@@ -112,6 +112,10 @@ img { -webkit-user-drag: none; }
 }
 .bottomnav__tab.is-active { color: #fff; }
 .bottomnav__icon { display: inline-flex; line-height: 0; }
+/* Raster nav icons can't recolor via currentColor, so active state is
+   conveyed with opacity + a soft glow instead of a color swap. */
+.bottomnav__icon .icon--raster { opacity: 0.62; filter: none; transition: opacity 0.2s, filter 0.2s; }
+.bottomnav__tab.is-active .bottomnav__icon .icon--raster { opacity: 1; filter: drop-shadow(0 0 5px rgba(255,255,255,0.55)); }
 .bottomnav__label { font-size: 10px; font-weight: 800; }
 .bottomnav__dot { position: absolute; top: 2px; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
 

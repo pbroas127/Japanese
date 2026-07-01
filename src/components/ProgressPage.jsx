@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import KikoCharacter from './KikoCharacter'
 import Icon from './Icon'
+import StreakFlame from './StreakFlame'
 import { CURRENCY, FREEZE_COST } from '../data/gameData'
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -33,7 +34,7 @@ export default function ProgressPage({ game }) {
       {/* Daily streak + freezes */}
       <div className="streak-card">
         <div className="streak-card__main">
-          <Icon name="flame" size={30} className="streak-card__flame" />
+          <StreakFlame lit={game.streak > 0} size={30} className="streak-card__flame" />
           <div>
             <span className="streak-card__num">{game.streak}</span>
             <span className="streak-card__unit"> day{game.streak === 1 ? '' : 's'}</span>

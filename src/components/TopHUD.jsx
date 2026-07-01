@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { levelFromXp, xpIntoLevel, XP_PER_LEVEL, streakTier, CURRENCY } from '../data/gameData'
 import { MAX_HEARTS, HEART_COST } from '../utils/hearts'
 import Icon from './Icon'
+import StreakFlame from './StreakFlame'
 
 // ──────────────────────────────────────────────────────────────────────────
 //  TopHUD — fantasy status bar: level crest (tap for the Level Path), XP bar,
@@ -79,7 +80,7 @@ export default function TopHUD({
         disabled={!onOpenStreak}
         whileTap={onOpenStreak ? { scale: 0.92 } : {}}
       >
-        <Icon name="flame" size={16} className="hud__chip-icon" />
+        <StreakFlame lit={streak > 0} size={16} className="hud__chip-icon" />
         <span className="hud__chip-val">{streak}</span>
       </motion.button>
 
