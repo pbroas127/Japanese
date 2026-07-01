@@ -405,61 +405,7 @@ export const KANA_TIPS = {
 //
 // PLACEHOLDER NOTE: every world currently reuses the same background art, dotted
 // path, and node coordinates. Real per-world backgrounds + hand-placed nodes
-// come later (via the layout editor). The order/gating/content is final.
-const PLACEHOLDER_PATH = [
-  { x: 50, y: 86.1 },
-  { x: 72.6, y: 84.7 },
-  { x: 79.3, y: 79.3 },
-  { x: 73.8, y: 72.7 },
-  { x: 76.7, y: 65.6 },
-  { x: 67.7, y: 71.4 },
-  { x: 48.8, y: 68.8 },
-  { x: 23.5, y: 67.1 },
-  { x: 17.2, y: 54.2 },
-  { x: 40, y: 50.9 },
-  { x: 50.7, y: 51.6 },
-  { x: 71.5, y: 51.5 },
-  { x: 78, y: 45.8 },
-  { x: 74, y: 35.7 },
-  { x: 75.4, y: 23.8 },
-  { x: 48.6, y: 23.8 },
-  { x: 29.5, y: 26.6 },
-  { x: 22.9, y: 35 },
-]
-// Shared placeholder node coordinates (5 lessons + a boss) reused per world.
-const PLACEHOLDER_SLOTS = [
-  { marker: 'book', pos: { x: 51.2, y: 87.2 } },
-  { marker: 'study', pos: { x: 77.1, y: 66.6 } },
-  { marker: 'scroll', pos: { x: 24.3, y: 67.6 } },
-  { marker: 'lantern', pos: { x: 50.2, y: 52 } },
-  { marker: 'altar', pos: { x: 75.5, y: 24.7 } },
-  { marker: 'torii', pos: { x: 23.2, y: 30.5 } },
-]
-// Build a world's nodes from a prefix + five lesson ids + place names.
-// Every world cycles through the same 6 marker TYPES (book/study/scroll/
-// lantern/altar/torii) in the same slot order — each world just has its own
-// re-skinned art per type (see NODE_ASSETS, nested by world id).
-function buildNodes(prefix, lessonIds, places) {
-  const nodes = lessonIds.map((lessonId, i) => ({
-    id: `${prefix}n${i + 1}`,
-    type: 'lesson',
-    lessonId,
-    label: `${i + 1}`,
-    marker: PLACEHOLDER_SLOTS[i].marker,
-    place: places[i],
-    pos: PLACEHOLDER_SLOTS[i].pos,
-  }))
-  nodes.push({
-    id: `${prefix}boss`,
-    type: 'boss',
-    lessonId: null,
-    label: 'B',
-    marker: PLACEHOLDER_SLOTS[5].marker,
-    place: places[5],
-    pos: PLACEHOLDER_SLOTS[5].pos,
-  })
-  return nodes
-}
+// come later. The order/gating/content is final.
 
 export const WORLDS = [
   {
@@ -467,7 +413,26 @@ export const WORLDS = [
     name: 'Forest of First Sounds',
     art: { w: 1536, h: 2752 },
     kikoHome: { x: 24.7, y: 17.5 },
-    path: PLACEHOLDER_PATH,
+    path: [
+      { x: 50, y: 86.1 },
+      { x: 72.6, y: 84.7 },
+      { x: 79.3, y: 79.3 },
+      { x: 73.8, y: 72.7 },
+      { x: 76.7, y: 65.6 },
+      { x: 67.7, y: 71.4 },
+      { x: 48.8, y: 68.8 },
+      { x: 23.5, y: 67.1 },
+      { x: 17.2, y: 54.2 },
+      { x: 40, y: 50.9 },
+      { x: 50.7, y: 51.6 },
+      { x: 71.5, y: 51.5 },
+      { x: 78, y: 45.8 },
+      { x: 74, y: 35.7 },
+      { x: 75.4, y: 23.8 },
+      { x: 48.6, y: 23.8 },
+      { x: 29.5, y: 26.6 },
+      { x: 22.9, y: 35 },
+    ],
     bossName: 'Hiragana Guardian',
     nodes: [
       { id: 'n1', type: 'lesson', lessonId: 'l1', label: '1', marker: 'book', place: 'Reading Clearing', pos: { x: 51.2, y: 87.2 } },
@@ -482,27 +447,70 @@ export const WORLDS = [
     id: 'meadow',
     name: 'Meadow of New Voices',
     art: { w: 1536, h: 2752 },
-    kikoHome: { x: 24.7, y: 17.5 },
-    path: PLACEHOLDER_PATH,
+    kikoHome: { x: 24.3, y: 13.4 },
     bossName: 'Echo Spirit',
-    nodes: buildNodes(
-      'w2',
-      ['l6', 'l7', 'l8', 'l9', 'l10'],
-      ['Hill Path', 'Marsh Hollow', 'Valley Rise', 'River Bend', 'Wood Gate', "Spirit's Arch"],
-    ),
+    path: [
+      { x: 49.5, y: 95.8 },
+      { x: 71.4, y: 94.7 },
+      { x: 79.2, y: 89.5 },
+      { x: 74, y: 82.3 },
+      { x: 77.7, y: 73.7 },
+      { x: 68.8, y: 79.7 },
+      { x: 49, y: 77.1 },
+      { x: 24, y: 74.6 },
+      { x: 16.3, y: 66.5 },
+      { x: 23.4, y: 57.9 },
+      { x: 53.2, y: 57.4 },
+      { x: 71.7, y: 57.4 },
+      { x: 78.6, y: 52 },
+      { x: 74.5, y: 40.5 },
+      { x: 74.8, y: 26.8 },
+      { x: 52.7, y: 26.9 },
+      { x: 31.6, y: 28.2 },
+      { x: 22.9, y: 38 },
+    ],
+    nodes: [
+      { id: 'w2n1', type: 'lesson', lessonId: 'l6', label: '1', marker: 'book', place: 'Hill Path', pos: { x: 51, y: 97.2 } },
+      { id: 'w2n2', type: 'lesson', lessonId: 'l7', label: '2', marker: 'study', place: 'Marsh Hollow', pos: { x: 78.2, y: 74.5 } },
+      { id: 'w2n3', type: 'lesson', lessonId: 'l8', label: '3', marker: 'scroll', place: 'Valley Rise', pos: { x: 23, y: 75 } },
+      { id: 'w2n4', type: 'lesson', lessonId: 'l9', label: '4', marker: 'lantern', place: 'River Bend', pos: { x: 51.5, y: 57.1 } },
+      { id: 'w2n5', type: 'lesson', lessonId: 'l10', label: '5', marker: 'altar', place: 'Wood Gate', pos: { x: 74.9, y: 27.5 } },
+      { id: 'w2boss', type: 'boss', lessonId: null, label: 'B', marker: 'torii', place: "Spirit's Arch", pos: { x: 22.8, y: 37.8 } },
+    ],
   },
   {
     id: 'canyon',
     name: 'Canyon of Bold Voices',
     art: { w: 1536, h: 2752 },
-    kikoHome: { x: 24.7, y: 17.5 },
-    path: PLACEHOLDER_PATH,
+    kikoHome: { x: 21.6, y: 34.5 },
     bossName: 'Thunder Oni',
-    nodes: buildNodes(
-      'w3',
-      ['l11', 'l12', 'l13', 'l14', 'l15'],
-      ['Glade Overlook', 'Swamp Crossing', 'Delta Flats', 'Bluff Edge', 'Peak Trail', "Oni's Drum"],
-    ),
+    path: [
+      { x: 43.4, y: 98.1 },
+      { x: 80.3, y: 92.9 },
+      { x: 84.4, y: 86.6 },
+      { x: 69, y: 80 },
+      { x: 45.3, y: 77.2 },
+      { x: 24.6, y: 69.5 },
+      { x: 20.2, y: 64 },
+      { x: 43.2, y: 56.4 },
+      { x: 61.6, y: 53 },
+      { x: 83.5, y: 47.5 },
+      { x: 87.3, y: 39.7 },
+      { x: 75.9, y: 32.6 },
+      { x: 62.6, y: 30.3 },
+      { x: 55.8, y: 26.6 },
+      { x: 48.2, y: 21.5 },
+      { x: 53, y: 16.8 },
+      { x: 54.1, y: 10.8 },
+    ],
+    nodes: [
+      { id: 'w3n1', type: 'lesson', lessonId: 'l11', label: '1', marker: 'book', place: 'Glade Overlook', pos: { x: 43.2, y: 100 } },
+      { id: 'w3n2', type: 'lesson', lessonId: 'l12', label: '2', marker: 'study', place: 'Swamp Crossing', pos: { x: 84, y: 87.5 } },
+      { id: 'w3n3', type: 'lesson', lessonId: 'l13', label: '3', marker: 'scroll', place: 'Delta Flats', pos: { x: 20.7, y: 64.5 } },
+      { id: 'w3n4', type: 'lesson', lessonId: 'l14', label: '4', marker: 'lantern', place: 'Bluff Edge', pos: { x: 61.1, y: 53.3 } },
+      { id: 'w3n5', type: 'lesson', lessonId: 'l15', label: '5', marker: 'altar', place: 'Peak Trail', pos: { x: 62.6, y: 30.4 } },
+      { id: 'w3boss', type: 'boss', lessonId: null, label: 'B', marker: 'torii', place: "Oni's Drum", pos: { x: 55, y: 9.7 } },
+    ],
   },
 ]
 
