@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { WORLDS, getLesson } from '../data/gameData'
 
 function Toggle({ label, hint, on, onToggle }) {
   return (
@@ -22,6 +23,7 @@ export default function SettingsPage({ game }) {
   const { settings, account } = game
   const [name, setName] = useState(account.username || '')
   const [confirmReset, setConfirmReset] = useState(false)
+  const [jumpNode, setJumpNode] = useState('')
 
   return (
     <div className="page settings-page">
@@ -65,6 +67,38 @@ export default function SettingsPage({ game }) {
       <section className="settings-group">
         <h3 className="settings-group__title">Accessibility</h3>
         <Toggle label="Reduce motion" hint="Calmer animations" on={settings.reducedMotion} onToggle={() => game.updateSetting('reducedMotion', !settings.reducedMotion)} />
+      </section>
+
+      <section className="settings-group">
+        <h3 className="settings-group__title">Developer</h3>
+        <p className="settings-note">Jump straight to any level — everything before it is auto-completed.</p>
+        <div className="settings-account">
+          <select
+            className="settings-input"
+            value={jumpNode}
+            onChange={(e) => setJumpNode(e.target.value)}
+          >
+            <option value="">Select a level…</option>
+            {WORLDS.map((world, wi) => (
+              <optgroup key={world.id} label={`World ${wi + 1} · ${world.name}`}>
+                {world.nodes.map((node, ni) => (
+                  <option key={node.id} value={node.id}>
+                    {node.type === 'boss'
+                      ? `Boss · ${world.bossName}`
+                      : `Level ${ni + 1} · ${getLesson(node.lessonId)?.title}`}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <button
+            className="btn btn--primary btn--sm"
+            disabled={!jumpNode}
+            onClick={() => jumpNode && game.jumpTo(jumpNode)}
+          >
+            Jump
+          </button>
+        </div>
       </section>
 
       <section className="settings-group">

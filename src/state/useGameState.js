@@ -6,6 +6,7 @@ import {
   getWorldOf,
   worldUnlocked,
   worldBossId,
+  jumpToNode,
   getLesson,
   crossedMilestone,
   levelFromXp,
@@ -265,6 +266,18 @@ export function useGameState() {
 
   const clearFlash = useCallback(() => setFlash(null), [])
 
+  // Dev tool: jump straight to any node, auto-completing everything before it.
+  const jumpTo = useCallback((nodeId) => {
+    const { completed, progress, kana } = jumpToNode(nodeId)
+    setState((prev) => ({
+      ...prev,
+      completed,
+      progress,
+      xp: completed.length * XP_LESSON_CLEAR,
+      stats: { ...prev.stats, kana: uniq([...prev.stats.kana, ...kana]) },
+    }))
+  }, [])
+
   const derived = useMemo(() => {
     const { stats } = state
     return {
@@ -297,5 +310,6 @@ export function useGameState() {
     signOut,
     reset,
     clearFlash,
+    jumpTo,
   }
 }

@@ -17,6 +17,11 @@ export const ROMAJI_POOL = [
   'ya', 'yu', 'yo',
   'ra', 'ri', 'ru', 're', 'ro',
   'wa', 'wo', 'n',
+  'ga', 'gi', 'gu', 'ge', 'go',
+  'za', 'ji', 'zu', 'ze', 'zo',
+  'da', 'de', 'do',
+  'ba', 'bi', 'bu', 'be', 'bo',
+  'pa', 'pi', 'pu', 'pe', 'po',
 ]
 
 // The five lessons of the Forest. Content is cumulative.
@@ -217,6 +222,107 @@ export const LESSONS = [
       { kana: 'えん', romaji: 'en', meaning: 'yen' },
     ],
   },
+  {
+    id: 'l11',
+    title: 'The G Glade',
+    subtitle: 'が ぎ ぐ げ ご',
+    accent: '#5F9DE8',
+    kana: [
+      { char: 'が', romaji: 'ga' },
+      { char: 'ぎ', romaji: 'gi' },
+      { char: 'ぐ', romaji: 'gu' },
+      { char: 'げ', romaji: 'ge' },
+      { char: 'ご', romaji: 'go' },
+    ],
+    examples: [
+      { kana: 'かがみ', romaji: 'kagami', meaning: 'mirror' },
+      { kana: 'かぎ', romaji: 'kagi', meaning: 'key' },
+      { kana: 'げんき', romaji: 'genki', meaning: 'healthy / fine' },
+      { kana: 'えいご', romaji: 'eigo', meaning: 'English (language)' },
+      { kana: 'ごご', romaji: 'gogo', meaning: 'afternoon / PM' },
+    ],
+  },
+  {
+    id: 'l12',
+    title: 'The Z Swamp',
+    subtitle: 'ざ じ ず ぜ ぞ',
+    accent: '#5FBFA8',
+    kana: [
+      { char: 'ざ', romaji: 'za' },
+      { char: 'じ', romaji: 'ji' },
+      { char: 'ず', romaji: 'zu' },
+      { char: 'ぜ', romaji: 'ze' },
+      { char: 'ぞ', romaji: 'zo' },
+    ],
+    examples: [
+      { kana: 'みず', romaji: 'mizu', meaning: 'water' },
+      { kana: 'かぜ', romaji: 'kaze', meaning: 'wind / a cold' },
+      { kana: 'ちず', romaji: 'chizu', meaning: 'map' },
+      { kana: 'かず', romaji: 'kazu', meaning: 'number' },
+      { kana: 'かぞく', romaji: 'kazoku', meaning: 'family' },
+    ],
+  },
+  {
+    id: 'l13',
+    title: 'The D Delta',
+    subtitle: 'だ で ど',
+    accent: '#E88F5F',
+    // ぢ and づ are historically merged with じ and ず in modern pronunciation
+    // and rarely appear outside compound words — skipped to keep every
+    // reverse (romaji → kana) question unambiguous.
+    kana: [
+      { char: 'だ', romaji: 'da' },
+      { char: 'で', romaji: 'de' },
+      { char: 'ど', romaji: 'do' },
+    ],
+    examples: [
+      { kana: 'だれ', romaji: 'dare', meaning: 'who' },
+      { kana: 'どこ', romaji: 'doko', meaning: 'where' },
+      { kana: 'でも', romaji: 'demo', meaning: 'but / however' },
+      { kana: 'まど', romaji: 'mado', meaning: 'window' },
+      { kana: 'どうぞ', romaji: 'douzo', meaning: 'here you go / please' },
+    ],
+  },
+  {
+    id: 'l14',
+    title: 'The B Bluff',
+    subtitle: 'ば び ぶ べ ぼ',
+    accent: '#C9689B',
+    kana: [
+      { char: 'ば', romaji: 'ba' },
+      { char: 'び', romaji: 'bi' },
+      { char: 'ぶ', romaji: 'bu' },
+      { char: 'べ', romaji: 'be' },
+      { char: 'ぼ', romaji: 'bo' },
+    ],
+    examples: [
+      { kana: 'たべる', romaji: 'taberu', meaning: 'to eat' },
+      { kana: 'あそぶ', romaji: 'asobu', meaning: 'to play' },
+      { kana: 'よぶ', romaji: 'yobu', meaning: 'to call' },
+      { kana: 'ぼく', romaji: 'boku', meaning: 'I (used by males)' },
+      { kana: 'かばん', romaji: 'kaban', meaning: 'bag' },
+    ],
+  },
+  {
+    id: 'l15',
+    title: 'The P Peak',
+    subtitle: 'ぱ ぴ ぷ ぺ ぽ',
+    accent: '#D4A03D',
+    kana: [
+      { char: 'ぱ', romaji: 'pa' },
+      { char: 'ぴ', romaji: 'pi' },
+      { char: 'ぷ', romaji: 'pu' },
+      { char: 'ぺ', romaji: 'pe' },
+      { char: 'ぽ', romaji: 'po' },
+    ],
+    examples: [
+      { kana: 'えんぴつ', romaji: 'enpitsu', meaning: 'pencil' },
+      { kana: 'さんぽ', romaji: 'sanpo', meaning: 'a walk / stroll' },
+      { kana: 'かんぱい', romaji: 'kanpai', meaning: 'cheers!' },
+      { kana: 'ぽかぽか', romaji: 'pokapoka', meaning: 'warm & cozy' },
+      { kana: 'てんぷら', romaji: 'tenpura', meaning: 'tempura' },
+    ],
+  },
 ]
 
 // Short memory hooks shown on the Learn-stage flashcards. Keep them punchy —
@@ -268,6 +374,29 @@ export const KANA_TIPS = {
   わ: 'A swan gliding — wa',
   を: 'A fancy お — "wo" (the object particle)',
   ん: 'A single squiggle — n',
+  が: 'か buzzing with two little marks (゛) — ga',
+  ぎ: 'き with a buzz added — gi',
+  ぐ: 'く humming louder — gu',
+  げ: 'け getting a voiced buzz — ge',
+  ご: 'こ with two dashes, deeper — go',
+  ざ: 'さ with a buzz — za',
+  じ: 'し with a buzz — ji',
+  ず: 'す with a buzz — zu',
+  ぜ: 'せ with a buzz — ze',
+  ぞ: 'そ with a buzz — zo',
+  だ: 'た with a buzz — da',
+  で: 'て with a buzz — de',
+  ど: 'と with a buzz — do',
+  ば: 'は with a buzz — ba',
+  び: 'ひ with a buzz — bi',
+  ぶ: 'ふ with a buzz — bu',
+  べ: 'へ with a buzz — be',
+  ぼ: 'ほ with a buzz — bo',
+  ぱ: 'は with a little pop (゜) on top — pa',
+  ぴ: 'ひ with a pop — pi',
+  ぷ: 'ふ with a pop — pu',
+  ぺ: 'へ with a pop — pe',
+  ぽ: 'ほ with a pop — po',
 }
 
 // World structure: an ordered list of worlds, each a vertically-scrollable map.
@@ -359,6 +488,19 @@ export const WORLDS = [
       ['Hill Path', 'Marsh Hollow', 'Valley Rise', 'River Bend', 'Wood Gate', "Spirit's Arch"],
     ),
   },
+  {
+    id: 'canyon',
+    name: 'Canyon of Bold Voices',
+    art: { w: 1536, h: 2752 },
+    kikoHome: { x: 24.7, y: 17.5 },
+    path: PLACEHOLDER_PATH,
+    bossName: 'Thunder Oni',
+    nodes: buildNodes(
+      'w3',
+      ['l11', 'l12', 'l13', 'l14', 'l15'],
+      ['Glade Overlook', 'Swamp Crossing', 'Delta Flats', 'Bluff Edge', 'Peak Trail', "Oni's Drum"],
+    ),
+  },
 ]
 
 // Flat lookups across every world.
@@ -378,6 +520,29 @@ export function worldUnlocked(worldId, completed) {
   const idx = WORLDS.findIndex((w) => w.id === worldId)
   if (idx <= 0) return true
   return completed.includes(worldBossId(WORLDS[idx - 1]))
+}
+
+// ── Dev tool: jump to any node ──────────────────────────────────────────────
+// Every node up to (not including) the target is marked complete, so the
+// target becomes the new "current" node. Used by the Settings dev shortcut to
+// preview any level without grinding the ones before it.
+export function jumpToNode(nodeId) {
+  const idx = ALL_NODES.findIndex((n) => n.id === nodeId)
+  if (idx < 0) return { completed: [], progress: {}, kana: [] }
+  const before = ALL_NODES.slice(0, idx)
+  const completed = before.map((n) => n.id)
+  const progress = {}
+  before.forEach((n) => {
+    progress[n.id] = { stagesDone: 3, quizPassed: true }
+  })
+  const kana = [
+    ...new Set(
+      before
+        .filter((n) => n.lessonId)
+        .flatMap((n) => getLesson(n.lessonId).kana.map((k) => k.char)),
+    ),
+  ]
+  return { completed, progress, kana }
 }
 
 // Boss definition: the Hiragana Guardian (a friendly wolf spirit).
