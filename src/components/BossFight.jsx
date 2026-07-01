@@ -15,7 +15,7 @@ import Icon from './Icon'
 //  Kiko is hurt + loses HP. Win at boss 0 HP, lose at Kiko 0 HP. Animations
 //  are synced to each hit and always settle back to idle.
 // ──────────────────────────────────────────────────────────────────────────
-export default function BossFight({ node, xp, streak, petals, onWin, onLose, onExit }) {
+export default function BossFight({ node, xp, streak, petals, hearts, onWin, onLose, onExit }) {
   const world = getWorldOf(node.id)
   const bossName = world?.bossName || BOSS.name
   const stats = useMemo(() => bossStatsForWorld(world?.id), [world])
@@ -119,7 +119,7 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
                   <KikoCharacter state="victory" size={150} shadow={false} />
                   <h2 className="result-panel__title">Guardian Calmed!</h2>
                   <p className="result-panel__sub">
-                    You cleared the {world?.name || 'world'}! +250 XP and a pile of Sakura Petals.
+                    You cleared the {world?.name || 'world'}! +250 XP, a pile of Sakura Petals, and your hearts are fully restored.
                   </p>
                   <motion.button className="btn btn--primary" onClick={onExit} whileTap={{ scale: 0.95 }}>
                     Finish World
@@ -130,6 +130,9 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
                   <KikoCharacter state="sad" size={150} shadow={false} />
                   <h2 className="result-panel__title">Kiko Fainted…</h2>
                   <p className="result-panel__sub">The Guardian was too strong this time. Regroup and try again!</p>
+                  <motion.div className="result-heart-lost" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                    <Icon name="heart" size={14} /> -1 heart · {hearts} left
+                  </motion.div>
                   <motion.button className="btn btn--primary" onClick={onExit} whileTap={{ scale: 0.95 }}>
                     Back to map
                   </motion.button>

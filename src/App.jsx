@@ -57,6 +57,7 @@ export default function App() {
                   xp={game.xp}
                   streak={game.streak}
                   petals={game.petals}
+                  hearts={game.hearts}
                   stagesDone={game.getProgress(overlayNode.id).stagesDone}
                   streakActiveToday={game.streakActiveToday}
                   onStage={game.completeStage}
@@ -74,6 +75,7 @@ export default function App() {
                   xp={game.xp}
                   streak={game.streak}
                   petals={game.petals}
+                  hearts={game.hearts}
                   onWin={game.winBoss}
                   onLose={game.loseBoss}
                   onExit={closeOverlay}

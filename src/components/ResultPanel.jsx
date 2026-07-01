@@ -14,6 +14,8 @@ export default function ResultPanel({
   xpGained,
   petalsGained = 0,
   streak,
+  hearts,
+  heartLost = false,
   onContinue,
   onRetry,
   continueLabel = 'Back to map',
@@ -39,6 +41,17 @@ export default function ResultPanel({
             ? 'Kiko learned new kana and grew stronger!'
             : 'The kana slipped away. Give it another try!'}
         </p>
+
+        {heartLost && (
+          <motion.div
+            className="result-heart-lost"
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 240, damping: 16 }}
+          >
+            <Icon name="heart" size={14} /> -1 heart · {hearts} left
+          </motion.div>
+        )}
 
         <div className="result-panel__stats">
           <div className="result-stat">

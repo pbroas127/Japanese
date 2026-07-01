@@ -41,6 +41,7 @@ export default function LessonScreen({
   xp,
   streak,
   petals,
+  hearts,
   stagesDone = 0,
   streakActiveToday = false,
   onStage,
@@ -188,8 +189,10 @@ export default function LessonScreen({
             xpGained={result.xpGained}
             petalsGained={result.petalsGained}
             streak={result.streak}
+            hearts={hearts}
+            heartLost={!result.pass}
             onContinue={onExit}
-            onRetry={result.pass ? null : retryQuiz}
+            onRetry={!result.pass && hearts > 0 ? retryQuiz : null}
           />
         )}
       </AnimatePresence>
