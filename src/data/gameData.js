@@ -436,13 +436,15 @@ const PLACEHOLDER_SLOTS = [
   { marker: 'torii', pos: { x: 23.2, y: 30.5 } },
 ]
 // Build a world's nodes from a prefix + five lesson ids + place names.
-function buildNodes(prefix, lessonIds, places) {
+// `marker` overrides the placeholder forest markers with a single world-themed
+// marker type (used once that world has its own generated marker art).
+function buildNodes(prefix, lessonIds, places, marker) {
   const nodes = lessonIds.map((lessonId, i) => ({
     id: `${prefix}n${i + 1}`,
     type: 'lesson',
     lessonId,
     label: `${i + 1}`,
-    marker: PLACEHOLDER_SLOTS[i].marker,
+    marker: marker || PLACEHOLDER_SLOTS[i].marker,
     place: places[i],
     pos: PLACEHOLDER_SLOTS[i].pos,
   }))
@@ -451,7 +453,7 @@ function buildNodes(prefix, lessonIds, places) {
     type: 'boss',
     lessonId: null,
     label: 'B',
-    marker: PLACEHOLDER_SLOTS[5].marker,
+    marker: marker || PLACEHOLDER_SLOTS[5].marker,
     place: places[5],
     pos: PLACEHOLDER_SLOTS[5].pos,
   })
@@ -486,6 +488,7 @@ export const WORLDS = [
       'w2',
       ['l6', 'l7', 'l8', 'l9', 'l10'],
       ['Hill Path', 'Marsh Hollow', 'Valley Rise', 'River Bend', 'Wood Gate', "Spirit's Arch"],
+      'meadow',
     ),
   },
   {
@@ -499,6 +502,7 @@ export const WORLDS = [
       'w3',
       ['l11', 'l12', 'l13', 'l14', 'l15'],
       ['Glade Overlook', 'Swamp Crossing', 'Delta Flats', 'Bluff Edge', 'Peak Trail', "Oni's Drum"],
+      'canyon',
     ),
   },
 ]

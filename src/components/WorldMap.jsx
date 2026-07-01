@@ -84,13 +84,13 @@ export default function WorldMap({ getStatus, getProgress, onSelectNode, worldCo
               <div className="worldmap__scene" style={{ aspectRatio: `${world.art.w} / ${world.art.h}` }}>
                 <img
                   className="worldmap__bg-img"
-                  src={WORLD_ASSETS.background}
+                  src={WORLD_ASSETS[world.id] || WORLD_ASSETS.forest}
                   alt={world.name}
                   draggable={false}
                   onError={(e) => {
                     if (!e.currentTarget.dataset.fb) {
                       e.currentTarget.dataset.fb = '1'
-                      e.currentTarget.src = WORLD_FALLBACK.background
+                      e.currentTarget.src = WORLD_FALLBACK[world.id] || WORLD_FALLBACK.forest
                     }
                   }}
                 />

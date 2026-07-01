@@ -9,6 +9,8 @@ const MARKER_ICON = {
   lantern: 'lantern',
   altar: 'flame',
   torii: 'torii',
+  meadow: 'sparkle',
+  canyon: 'flame',
 }
 const STATUS_ICON = { completed: 'check', current: 'play', locked: 'lock' }
 

@@ -32,12 +32,18 @@ export const BOSS_ASSETS = {
 }
 export const BOSS_FALLBACK = '/assets/boss/idle.svg'
 
-// ── World background ── (exact image uploaded by the user)
+// ── World backgrounds (one per world, keyed by world id) ──
 export const WORLD_ASSETS = {
-  background: 'https://d2ol7oe51mr4n9.cloudfront.net/user_3DIHRL4hfIamgJ8ncr9DUxS5zcC/c903d3bc-b1e3-4d0b-b903-837fe56885d0.png',
+  // Exact image uploaded by the user for World 1.
+  forest: 'https://d2ol7oe51mr4n9.cloudfront.net/user_3DIHRL4hfIamgJ8ncr9DUxS5zcC/c903d3bc-b1e3-4d0b-b903-837fe56885d0.png',
+  // Generated from the World 1 background as a style reference (Higgsfield).
+  meadow: `${CDN}/hf_20260701_045929_c48c93a8-929c-422e-9c13-90cad7989233.png`,
+  canyon: `${CDN}/hf_20260701_045947_4f2dce1c-4e88-4e34-a2c4-687d0e72eb41.png`,
 }
 export const WORLD_FALLBACK = {
-  background: '/assets/world/forest-bg.svg',
+  forest: '/assets/world/forest-bg.svg',
+  meadow: '/assets/world/forest-bg.svg',
+  canyon: '/assets/world/forest-bg.svg',
 }
 
 // ── Typed node markers (unlocked + distinct locked asset per type) ──
@@ -66,6 +72,16 @@ export const NODE_ASSETS = {
     unlocked: `${CDN}/hf_20260629_182210_cc723e59-2743-4646-8daa-3beb5be986f1.png`,
     locked: `${CDN}/hf_20260629_182229_589cc29a-fbf3-4a89-a93d-da5ea7bfc5ea.png`,
   },
+  // World 2 (Meadow) — single marker style reused for all of that world's nodes.
+  meadow: {
+    unlocked: `${CDN}/hf_20260701_050136_2ff6c554-a7a5-4b4d-bd7a-bf7d091f79e1.png`,
+    locked: `${CDN}/hf_20260701_050140_838bc4dd-7fdb-428e-b464-80f661070c52.png`,
+  },
+  // World 3 (Canyon) — single marker style reused for all of that world's nodes.
+  canyon: {
+    unlocked: `${CDN}/hf_20260701_050143_697286eb-1f73-47d0-b9b4-b9cc03829bb6.png`,
+    locked: `${CDN}/hf_20260701_050147_a96ebee9-4ca5-4362-bce8-7ce315f95027.png`,
+  },
 }
 export const NODE_FALLBACK = {
   book: '/assets/world/markers/book.svg',
@@ -74,4 +90,6 @@ export const NODE_FALLBACK = {
   lantern: '/assets/world/markers/lantern.svg',
   altar: '/assets/world/markers/altar.svg',
   torii: '/assets/world/markers/torii.svg',
+  meadow: '/assets/world/markers/study.svg',
+  canyon: '/assets/world/markers/altar.svg',
 }
