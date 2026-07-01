@@ -8,15 +8,24 @@ import DialogueBubble from './DialogueBubble'
 import Icon from './Icon'
 import { smoothPath } from '../utils/path'
 
+// Kiko's home-base pose reacts to the marker type of the CURRENT node, so she
+// reads as "into" whatever that place is about rather than always studying.
+const MARKER_POSE = {
+  book: 'studying',
+  study: 'studying',
+  scroll: 'happy',
+  lantern: 'idle',
+  altar: 'excited',
+  torii: 'bossPrep',
+}
+
 // ──────────────────────────────────────────────────────────────────────────
 //  WorldMap — every world stacked into one vertical scroll. The FIRST world
 //  sits at the bottom; later worlds climb upward. A world stays sealed (grey
 //  overlay + lock) until the previous world's boss is cleared. Kiko lives in
-//  whichever world is currently active. Scroll clamps to the stack, so you
-//  can't scroll past the top of the last world or the bottom of the first.
-//
-//  Backgrounds, node coordinates and paths are shared placeholders for now —
-//  real per-world art + hand-placed nodes come later.
+//  whichever world is currently active, and her pose reacts to the current
+//  node's marker type. Scroll clamps to the stack, so you can't scroll past
+//  the top of the last world or the bottom of the first.
 // ──────────────────────────────────────────────────────────────────────────
 export default function WorldMap({ getStatus, getProgress, onSelectNode, worldComplete, flash, onClearFlash }) {
   const scrollRef = useRef(null)
@@ -67,7 +76,11 @@ export default function WorldMap({ getStatus, getProgress, onSelectNode, worldCo
 
           const currentNode = isActive ? world.nodes.find((n) => getStatus(n.id) === 'current') : null
           const completedCount = world.nodes.filter((n) => getStatus(n.id) === 'completed').length
-          const kikoPose = worldComplete ? 'victory' : currentNode?.type === 'boss' ? 'bossPrep' : 'studying'
+          const kikoPose = worldComplete
+            ? 'victory'
+            : currentNode
+              ? MARKER_POSE[currentNode.marker] || 'studying'
+              : 'idle'
           const line = getKikoLine({ currentNode, completedCount })
 
           return (
