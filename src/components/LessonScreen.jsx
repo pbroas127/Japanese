@@ -4,7 +4,7 @@ import {
   buildLearnSteps,
   buildUseSteps,
   buildQuizSteps,
-  PASS_THRESHOLD,
+  passThresholdForLesson,
   XP_LESSON_CLEAR,
   XP_PER_CORRECT,
   PETALS_LESSON_CLEAR,
@@ -22,7 +22,7 @@ import TopHUD from './TopHUD'
 //  LessonScreen — a 3-stage level, each stage a full interactive mini-lesson:
 //    1 · Learn — study cards + recognise the sound
 //    2 · Use   — study real words + match words ↔ meanings
-//    3 · Quiz  — graded mix of everything; ≥ PASS_THRESHOLD clears the level
+//    3 · Quiz  — graded mix of everything; pass threshold rises each world
 //
 //  Each stage ends on a completion screen → Next stage or Back to map. Stages
 //  bank the moment you finish them, so leaving keeps your dots. Failing the
@@ -78,7 +78,7 @@ export default function LessonScreen({
   }
 
   const finishQuiz = ({ correct, total }) => {
-    const pass = total ? correct / total >= PASS_THRESHOLD : true
+    const pass = total ? correct / total >= passThresholdForLesson(lesson.id) : true
     if (pass) onPass(node, correct, total)
     else onFail(node, correct, total)
     // The streak only advances on the first level cleared each day.

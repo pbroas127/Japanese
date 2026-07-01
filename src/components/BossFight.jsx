@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { buildBossQuestions, getWorldOf, BOSS } from '../data/gameData'
+import { buildBossQuestions, getWorldOf, bossStatsForWorld, BOSS } from '../data/gameData'
 import { useTransientState } from '../state/useTransientState'
 import KikoCharacter from './KikoCharacter'
 import BossCharacter from './BossCharacter'
@@ -9,7 +9,8 @@ import TopHUD from './TopHUD'
 import Icon from './Icon'
 
 // ──────────────────────────────────────────────────────────────────────────
-//  BossFight — the Hiragana Guardian.
+//  BossFight — gets harder every world: more boss HP, more damage per
+//  mistake, and a longer gauntlet with tougher (confusable) distractors.
 //  Correct → Kiko attacks, boss is hurt + loses HP. Wrong → boss attacks,
 //  Kiko is hurt + loses HP. Win at boss 0 HP, lose at Kiko 0 HP. Animations
 //  are synced to each hit and always settle back to idle.
@@ -17,10 +18,11 @@ import Icon from './Icon'
 export default function BossFight({ node, xp, streak, petals, onWin, onLose, onExit }) {
   const world = getWorldOf(node.id)
   const bossName = world?.bossName || BOSS.name
-  const questions = useMemo(() => buildBossQuestions(world?.id, 12), [world])
+  const stats = useMemo(() => bossStatsForWorld(world?.id), [world])
+  const questions = useMemo(() => buildBossQuestions(world?.id, stats.questionCount), [world, stats])
 
-  const [bossHp, setBossHp] = useState(BOSS.maxHp)
-  const [kikoHp, setKikoHp] = useState(BOSS.kikoMaxHp)
+  const [bossHp, setBossHp] = useState(stats.maxHp)
+  const [kikoHp, setKikoHp] = useState(stats.kikoMaxHp)
   const [qIndex, setQIndex] = useState(0)
   const [chosen, setChosen] = useState(null)
   const [locked, setLocked] = useState(false)
@@ -45,8 +47,8 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
       setTimeout(() => playKiko('hurt', 700), 260)
     }
 
-    const nextBossHp = isCorrect ? Math.max(0, bossHp - BOSS.damageToBoss) : bossHp
-    const nextKikoHp = isCorrect ? kikoHp : Math.max(0, kikoHp - BOSS.damageToKiko)
+    const nextBossHp = isCorrect ? Math.max(0, bossHp - stats.damageToBoss) : bossHp
+    const nextKikoHp = isCorrect ? kikoHp : Math.max(0, kikoHp - stats.damageToKiko)
     if (isCorrect) setBossHp(nextBossHp)
     else setKikoHp(nextKikoHp)
 
@@ -65,8 +67,8 @@ export default function BossFight({ node, xp, streak, petals, onWin, onLose, onE
     }, 1250)
   }
 
-  const bossPct = (bossHp / BOSS.maxHp) * 100
-  const kikoPct = (kikoHp / BOSS.kikoMaxHp) * 100
+  const bossPct = (bossHp / stats.maxHp) * 100
+  const kikoPct = (kikoHp / stats.kikoMaxHp) * 100
 
   return (
     <div className="screen boss">

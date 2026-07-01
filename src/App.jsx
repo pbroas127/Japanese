@@ -12,6 +12,8 @@ import SettingsPage from './components/SettingsPage'
 import LessonScreen from './components/LessonScreen'
 import BossFight from './components/BossFight'
 import StreakPage from './components/StreakPage'
+import HeartsPage from './components/HeartsPage'
+import LevelPage from './components/LevelPage'
 
 const pageMotion = {
   initial: { opacity: 0, y: 12 },
@@ -24,8 +26,18 @@ export default function App() {
   const game = useGameState()
   const [tab, setTab] = useState('map')
   const [overlay, setOverlay] = useState(null) // { type:'lesson'|'boss', nodeId }
+  const [outOfHeartsNotice, setOutOfHeartsNotice] = useState(false)
 
-  const openNode = (node) => setOverlay({ type: node.type === 'boss' ? 'boss' : 'lesson', nodeId: node.id })
+  // Lessons and boss fights cost a heart on failure, so entry is gated on
+  // having at least one — send the player to the Hearts page instead.
+  const openNode = (node) => {
+    if (game.outOfHearts) {
+      setOutOfHeartsNotice(true)
+      setTab('hearts')
+      return
+    }
+    setOverlay({ type: node.type === 'boss' ? 'boss' : 'lesson', nodeId: node.id })
+  }
   const closeOverlay = () => setOverlay(null)
 
   const overlayNode = overlay ? getNode(overlay.nodeId) : null
@@ -77,9 +89,16 @@ export default function App() {
                 xp={game.xp}
                 streak={game.streak}
                 petals={game.petals}
+                hearts={game.hearts}
                 onOpenProfile={() => setTab('progress')}
                 onOpenSettings={() => setTab('settings')}
                 onOpenStreak={() => setTab('streak')}
+                onOpenLevel={() => setTab('level')}
+                onOpenHearts={() => {
+                  setOutOfHeartsNotice(false)
+                  setTab('hearts')
+                }}
+                onBuyHeart={game.buyHeart}
               />
 
               <main className="shell__content">
@@ -108,6 +127,17 @@ export default function App() {
                     {tab === 'progress' && <ProgressPage game={game} />}
                     {tab === 'settings' && <SettingsPage game={game} />}
                     {tab === 'streak' && <StreakPage game={game} onClose={() => setTab('map')} />}
+                    {tab === 'level' && <LevelPage game={game} onClose={() => setTab('map')} />}
+                    {tab === 'hearts' && (
+                      <HeartsPage
+                        game={game}
+                        outOfHeartsNotice={outOfHeartsNotice}
+                        onClose={() => {
+                          setOutOfHeartsNotice(false)
+                          setTab('map')
+                        }}
+                      />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </main>

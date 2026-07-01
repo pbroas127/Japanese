@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { review } from '../utils/srs'
+import { settleHearts, MAX_HEARTS, HEART_COST } from '../utils/hearts'
 import {
   WORLDS,
   TOTAL_NODES,
@@ -11,6 +12,8 @@ import {
   crossedMilestone,
   levelFromXp,
   vocabUnlockedFor,
+  titleForLevel,
+  sumLevelUpRewards,
   TOTAL_KANA,
   XP_LESSON_CLEAR,
   XP_BOSS_CLEAR,
@@ -35,6 +38,8 @@ const DEFAULT_STATE = {
   freezeDays: [], // days bridged by a streak freeze (shown on the calendar)
   freezes: STARTING_FREEZES,
   petals: 0,
+  hearts: MAX_HEARTS,
+  heartsUpdatedAt: Date.now(),
   completed: [],
   // Per-node stage progress for the 3-stage levels (Learn → Use → Quiz).
   // { [nodeId]: { stagesDone: 0..3, quizPassed: boolean } }
@@ -51,13 +56,16 @@ function loadInitial() {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const saved = JSON.parse(raw)
-      return {
+      const merged = {
         ...DEFAULT_STATE,
         ...saved,
         stats: { ...DEFAULT_STATE.stats, ...(saved.stats || {}) },
         settings: { ...DEFAULT_STATE.settings, ...(saved.settings || {}) },
         account: { ...DEFAULT_STATE.account, ...(saved.account || {}) },
       }
+      // Credit any heart regen that happened while the app was closed.
+      const settled = settleHearts(merged.hearts, merged.heartsUpdatedAt)
+      return { ...merged, hearts: settled.hearts, heartsUpdatedAt: settled.updatedAt }
     }
   } catch {
     /* ignore corrupt storage */
@@ -133,6 +141,16 @@ function advanceStreak(prev) {
   return { streak, freezes, lastActive: today, milestone: crossedMilestone(prev.streak, streak), freezeUsedDays }
 }
 
+// ── Hearts helper ──
+// Losing a heart when full starts a fresh regen timer; losing one while
+// already below max leaves the existing shared timer untouched (Duolingo-
+// style: one timer counts toward the NEXT heart, not one per missing heart).
+function loseOneHeart(prev) {
+  const settled = settleHearts(prev.hearts, prev.heartsUpdatedAt)
+  const wasFull = settled.hearts >= MAX_HEARTS
+  return { hearts: Math.max(0, settled.hearts - 1), heartsUpdatedAt: wasFull ? Date.now() : settled.updatedAt }
+}
+
 export function useGameState() {
   const [state, setState] = useState(loadInitial)
   const [flash, setFlash] = useState(null)
@@ -180,14 +198,29 @@ export function useGameState() {
     const kanaChars = lesson ? lesson.kana.map((k) => k.char) : []
     setState((prev) => {
       const s = advanceStreak(prev)
-      const bonus = s.milestone ? s.milestone.bonus : 0
-      if (s.milestone) setFlash({ text: `${s.milestone.label} +${bonus} petals`, tier: s.milestone.tier })
+      const streakBonus = s.milestone ? s.milestone.bonus : 0
+      const xpGain = XP_LESSON_CLEAR + correct * XP_PER_CORRECT
+      const nextXp = prev.xp + xpGain
+      const lvl = sumLevelUpRewards(levelFromXp(prev.xp), levelFromXp(nextXp))
+
+      // Level-up takes priority over a streak-milestone flash if both land at once.
+      if (lvl.leveledUp) {
+        setFlash({ text: `Level ${lvl.newLevel} — ${titleForLevel(lvl.newLevel)}! +${lvl.petals} petals`, tier: 'legend' })
+      } else if (s.milestone) {
+        setFlash({ text: `${s.milestone.label} +${streakBonus} petals`, tier: s.milestone.tier })
+      }
+
+      const settledHearts = settleHearts(prev.hearts, prev.heartsUpdatedAt)
+      const hearts = lvl.milestoneHeart ? Math.min(MAX_HEARTS, settledHearts.hearts + 1) : settledHearts.hearts
+
       return {
         ...prev,
         completed: prev.completed.includes(node.id) ? prev.completed : [...prev.completed, node.id],
         progress: { ...prev.progress, [node.id]: { stagesDone: 3, quizPassed: true } },
-        xp: prev.xp + XP_LESSON_CLEAR + correct * XP_PER_CORRECT,
-        petals: prev.petals + PETALS_LESSON_CLEAR + correct * PETALS_PER_CORRECT + bonus,
+        xp: nextXp,
+        petals: prev.petals + PETALS_LESSON_CLEAR + correct * PETALS_PER_CORRECT + streakBonus + lvl.petals,
+        hearts,
+        heartsUpdatedAt: settledHearts.updatedAt,
         streak: s.streak,
         bestStreak: Math.max(prev.bestStreak, s.streak),
         freezes: s.freezes,
@@ -205,11 +238,11 @@ export function useGameState() {
     })
   }, [])
 
-  // Failing a lesson no longer affects the daily streak; the attempt still
-  // counts toward accuracy.
+  // Failing a lesson no longer affects the daily streak, but it costs a heart.
   const failLesson = useCallback((_node, correct, total) => {
     setState((prev) => ({
       ...prev,
+      ...loseOneHeart(prev),
       stats: {
         ...prev.stats,
         totalQuestions: prev.stats.totalQuestions + total,
@@ -221,13 +254,18 @@ export function useGameState() {
   const winBoss = useCallback((node) => {
     setState((prev) => {
       const s = advanceStreak(prev)
-      const bonus = s.milestone ? s.milestone.bonus : 0
+      const xpGain = XP_BOSS_CLEAR
+      const nextXp = prev.xp + xpGain
+      const lvl = sumLevelUpRewards(levelFromXp(prev.xp), levelFromXp(nextXp))
       setFlash({ text: 'World Cleared!', tier: 'legend' })
       return {
         ...prev,
         completed: prev.completed.includes(node.id) ? prev.completed : [...prev.completed, node.id],
-        xp: prev.xp + XP_BOSS_CLEAR,
-        petals: prev.petals + PETALS_BOSS_CLEAR + bonus,
+        xp: nextXp,
+        petals: prev.petals + PETALS_BOSS_CLEAR + (s.milestone ? s.milestone.bonus : 0) + lvl.petals,
+        // Defeating a boss fully refills your hearts.
+        hearts: MAX_HEARTS,
+        heartsUpdatedAt: Date.now(),
         streak: s.streak,
         bestStreak: Math.max(prev.bestStreak, s.streak),
         freezes: s.freezes,
@@ -239,13 +277,29 @@ export function useGameState() {
     })
   }, [])
 
-  // Losing the boss doesn't break a daily streak.
-  const loseBoss = useCallback(() => {}, [])
+  // Losing the boss doesn't break a daily streak, but it costs a heart.
+  const loseBoss = useCallback(() => {
+    setState((prev) => ({ ...prev, ...loseOneHeart(prev) }))
+  }, [])
 
   const buyFreeze = useCallback(() => {
     setState((prev) =>
       prev.petals >= FREEZE_COST ? { ...prev, petals: prev.petals - FREEZE_COST, freezes: prev.freezes + 1 } : prev,
     )
+  }, [])
+
+  const buyHeart = useCallback(() => {
+    setState((prev) => {
+      const settled = settleHearts(prev.hearts, prev.heartsUpdatedAt)
+      if (settled.hearts >= MAX_HEARTS || prev.petals < HEART_COST) return { ...prev, hearts: settled.hearts, heartsUpdatedAt: settled.updatedAt }
+      const hearts = settled.hearts + 1
+      return {
+        ...prev,
+        petals: prev.petals - HEART_COST,
+        hearts,
+        heartsUpdatedAt: hearts >= MAX_HEARTS ? Date.now() : settled.updatedAt,
+      }
+    })
   }, [])
 
   const updateSetting = useCallback((key, value) => {
@@ -266,6 +320,21 @@ export function useGameState() {
 
   const clearFlash = useCallback(() => setFlash(null), [])
 
+  // Credit any heart regen earned while the app has been sitting open (on top
+  // of the load-time settle in loadInitial), so a heart appears without
+  // requiring a refresh. The countdown UI itself ticks every second on its own.
+  useEffect(() => {
+    const t = setInterval(() => {
+      setState((prev) => {
+        if (prev.hearts >= MAX_HEARTS) return prev
+        const settled = settleHearts(prev.hearts, prev.heartsUpdatedAt)
+        if (settled.hearts === prev.hearts) return prev
+        return { ...prev, hearts: settled.hearts, heartsUpdatedAt: settled.updatedAt }
+      })
+    }, 30000)
+    return () => clearInterval(t)
+  }, [])
+
   // Dev tool: jump straight to any node, auto-completing everything before it.
   const jumpTo = useCallback((nodeId) => {
     const { completed, progress, kana } = jumpToNode(nodeId)
@@ -280,15 +349,21 @@ export function useGameState() {
 
   const derived = useMemo(() => {
     const { stats } = state
+    const level = levelFromXp(state.xp)
+    const settledHearts = settleHearts(state.hearts, state.heartsUpdatedAt)
     return {
-      level: levelFromXp(state.xp),
-      vocabUnlocked: vocabUnlockedFor(levelFromXp(state.xp)),
+      level,
+      levelTitle: titleForLevel(level),
+      vocabUnlocked: vocabUnlockedFor(level),
       worldComplete: state.completed.includes(LAST_BOSS_ID),
       streakActiveToday: state.lastActive === todayStr(),
       accuracy: stats.totalQuestions ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0,
       kanaMastered: stats.kana.length,
       totalKana: TOTAL_KANA,
       completionPct: Math.round((state.completed.length / TOTAL_NODES) * 100),
+      hearts: settledHearts.hearts,
+      heartsUpdatedAt: settledHearts.updatedAt,
+      outOfHearts: settledHearts.hearts <= 0,
     }
   }, [state])
 
@@ -305,6 +380,7 @@ export function useGameState() {
     winBoss,
     loseBoss,
     buyFreeze,
+    buyHeart,
     updateSetting,
     signIn,
     signOut,

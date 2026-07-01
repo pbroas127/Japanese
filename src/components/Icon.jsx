@@ -2,7 +2,7 @@
 //  Icon — a single inline-SVG icon set (no emojis, transparent, inherits
 //  currentColor). Line icons by default; a few are solid-filled.
 // ──────────────────────────────────────────────────────────────────────────
-const SOLID = new Set(['flame', 'petal', 'star', 'sparkle', 'tree', 'play', 'fox', 'settings'])
+const SOLID = new Set(['flame', 'petal', 'star', 'sparkle', 'tree', 'play', 'fox', 'settings', 'heart'])
 
 const BODY = {
   map: (
@@ -107,6 +107,8 @@ const BODY = {
       <circle cx="14.5" cy="12" r="1.1" fill="#2c2016" />
     </g>
   ),
+  heart: <path d="M12 20.5S3.5 15.3 3.5 9.3A4.8 4.8 0 0 1 12 6.2a4.8 4.8 0 0 1 8.5 3.1c0 6-8.5 11.2-8.5 11.2Z" />,
+  plus: <path d="M12 5v14M5 12h14" strokeWidth="3" />,
 }
 
 export default function Icon({ name, size = 24, className = '', strokeWidth }) {

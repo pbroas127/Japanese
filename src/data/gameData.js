@@ -556,7 +556,9 @@ export function jumpToNode(nodeId) {
   return { completed, progress, kana }
 }
 
-// Boss definition: the Hiragana Guardian (a friendly wolf spirit).
+// Boss definition (fallback / World 1 defaults — see BOSS_TIERS for the real
+// per-world stats, which get harder each world: more HP, more damage taken
+// per mistake, and a longer gauntlet).
 export const BOSS = {
   name: 'Hiragana Guardian',
   maxHp: 100,
@@ -564,9 +566,18 @@ export const BOSS = {
   damageToBoss: 20, // 5 correct answers to win
   damageToKiko: 25, // 4 wrong answers to lose
 }
+const BOSS_TIERS = [
+  { maxHp: 100, kikoMaxHp: 100, damageToBoss: 20, damageToKiko: 25, questionCount: 12 }, // World 1
+  { maxHp: 120, kikoMaxHp: 100, damageToBoss: 20, damageToKiko: 28, questionCount: 14 }, // World 2
+  { maxHp: 140, kikoMaxHp: 100, damageToBoss: 20, damageToKiko: 34, questionCount: 16 }, // World 3
+]
+export function bossStatsForWorld(worldId) {
+  const idx = WORLDS.findIndex((w) => w.id === worldId)
+  return BOSS_TIERS[Math.min(Math.max(idx, 0), BOSS_TIERS.length - 1)]
+}
 
 // ── Game economy ──
-export const PASS_THRESHOLD = 0.7 // 70% to clear a lesson
+export const PASS_THRESHOLD = 0.7 // 70% to clear a lesson (World 1 default)
 export const XP_PER_CORRECT = 10
 export const XP_LESSON_CLEAR = 50
 export const XP_BOSS_CLEAR = 250
@@ -600,6 +611,35 @@ export function crossedMilestone(prev, next) {
   return STREAK_MILESTONES.find((m) => prev < m.at && next >= m.at) || null
 }
 
+// ── Difficulty scaling ───────────────────────────────────────────────────────
+// Lessons get harder by world: l1-l5 = World 1 (tier 0), l6-l10 = World 2
+// (tier 1), l11-l15 = World 3 (tier 2). Higher tiers use a stricter pass
+// threshold and prefer visually/phonetically confusable distractors in the
+// graded quiz (study stages stay easy — only Stage 3 gets harder).
+function lessonTier(lessonId) {
+  const n = parseInt(lessonId.slice(1), 10)
+  if (n <= 5) return 0
+  if (n <= 10) return 1
+  return 2
+}
+export function passThresholdForLesson(lessonId) {
+  const tier = lessonTier(lessonId)
+  return tier === 0 ? 0.7 : tier === 1 ? 0.75 : 0.8
+}
+
+// A heuristic set of commonly-confused hiragana shapes/sounds (not exhaustive)
+// used to make higher-tier quizzes genuinely harder to guess, not just longer.
+const CONFUSABLE = {
+  し: ['つ', 'ち', 'り'], つ: ['し', 'ら', 'う'], ち: ['さ', 'ら', 'た'],
+  さ: ['ち', 'き', 'そ'], き: ['さ', 'け'],
+  ぬ: ['め', 'ね', 'わ'], め: ['ぬ', 'ね', 'わ'], ね: ['れ', 'わ', 'ぬ'],
+  れ: ['ね', 'わ', 'る'], わ: ['ね', 'れ', 'ぬ'],
+  る: ['ろ', 'れ'], ろ: ['る', 'ら'], ら: ['ち', 'ろ', 'た'],
+  は: ['ほ', 'ま'], ほ: ['は', 'ま'], い: ['り', 'こ'], り: ['い', 'こ'],
+  く: ['へ'], へ: ['く', 'せ'], す: ['む'], む: ['す', 'め'],
+  な: ['た', 'に'], に: ['な', 'け'], け: ['に', 'は'], ま: ['は', 'も'], も: ['ま', 'せ'], せ: ['も', 'へ'],
+}
+
 // ── Quiz builders ─────────────────────────────────────────────────────────
 
 function shuffle(arr) {
@@ -612,8 +652,12 @@ function shuffle(arr) {
 }
 
 // Build a single multiple-choice question for a kana (kana → romaji).
-function makeQuestion(kana) {
-  const distractors = shuffle(ROMAJI_POOL.filter((r) => r !== kana.romaji)).slice(0, 3)
+function makeQuestion(kana, hard = false) {
+  const preferred = hard
+    ? (CONFUSABLE[kana.char] || []).map((c) => ALL_KANA.find((x) => x.char === c)?.romaji).filter((r) => r && r !== kana.romaji)
+    : []
+  const rest = shuffle(ROMAJI_POOL.filter((r) => r !== kana.romaji && !preferred.includes(r)))
+  const distractors = [...new Set([...shuffle(preferred), ...rest])].slice(0, 3)
   const options = shuffle([kana.romaji, ...distractors])
   return {
     id: `${kana.char}-${Math.random().toString(36).slice(2, 7)}`,
@@ -621,12 +665,6 @@ function makeQuestion(kana) {
     answer: kana.romaji,
     options,
   }
-}
-
-// Build the quiz for a lesson — one question per kana, in random order so the
-// sequence of symbols isn't predictable from one attempt to the next.
-export function buildQuiz(lesson) {
-  return shuffle(lesson.kana).map(makeQuestion)
 }
 
 // ── Stage step builders ───────────────────────────────────────────────────
@@ -648,14 +686,20 @@ function choiceStep(prompt, answer, options, hint, item) {
 }
 
 // `item` is the SRS key the question tests: `k:<kana>` or `w:<word>`.
-// kana → romaji (pick the sound)
-function qKanaToRomaji(k) {
-  const distractors = shuffle(ROMAJI_POOL.filter((r) => r !== k.romaji)).slice(0, 3)
+// kana → romaji (pick the sound). `hard` prefers confusable distractors.
+function qKanaToRomaji(k, hard = false) {
+  const preferred = hard
+    ? (CONFUSABLE[k.char] || []).map((c) => ALL_KANA.find((x) => x.char === c)?.romaji).filter((r) => r && r !== k.romaji)
+    : []
+  const rest = shuffle(ROMAJI_POOL.filter((r) => r !== k.romaji && !preferred.includes(r)))
+  const distractors = [...new Set([...shuffle(preferred), ...rest])].slice(0, 3)
   return choiceStep(k.char, k.romaji, [k.romaji, ...distractors], 'Which sound is this?', `k:${k.char}`)
 }
-// romaji → kana (pick the symbol)
-function qRomajiToKana(k) {
-  const distractors = shuffle(ALL_KANA.filter((x) => x.char !== k.char)).slice(0, 3).map((x) => x.char)
+// romaji → kana (pick the symbol). `hard` prefers confusable distractors.
+function qRomajiToKana(k, hard = false) {
+  const preferred = hard ? (CONFUSABLE[k.char] || []).filter((c) => c !== k.char) : []
+  const rest = shuffle(ALL_KANA.filter((x) => x.char !== k.char && !preferred.includes(x.char)).map((x) => x.char))
+  const distractors = [...new Set([...shuffle(preferred), ...rest])].slice(0, 3)
   return choiceStep(k.romaji, k.char, [k.char, ...distractors], 'Tap the matching kana', `k:${k.char}`)
 }
 // meaning → word
@@ -683,10 +727,15 @@ export function buildUseSteps(lesson) {
   return [...cards, ...recall]
 }
 
-// Stage 3 · Quiz — graded mix of everything: both kana directions + word meaning.
+// Stage 3 · Quiz — graded mix of everything: both kana directions + word
+// meaning. Gets harder by world: more reverse questions and confusable
+// (harder-to-guess) distractors from World 2 onward.
 export function buildQuizSteps(lesson) {
-  const kana = lesson.kana.map(qKanaToRomaji)
-  const reverse = shuffle(lesson.kana).slice(0, 3).map(qRomajiToKana)
+  const tier = lessonTier(lesson.id)
+  const hard = tier >= 1
+  const kana = lesson.kana.map((k) => qKanaToRomaji(k, hard))
+  const reverseCount = tier === 0 ? 3 : tier === 1 ? 4 : 5
+  const reverse = shuffle(lesson.kana).slice(0, Math.min(reverseCount, lesson.kana.length)).map((k) => qRomajiToKana(k, hard))
   const words = lesson.examples.map(qWordToMeaning)
   return shuffle([...kana, ...reverse, ...words])
 }
@@ -797,11 +846,18 @@ export function buildReviewSteps(srs = {}, masteredChars = [], count = 12, vocab
 }
 
 // Build a mixed boss gauntlet drawing from the kana of one world's lessons.
-export function buildBossQuestions(worldId, count = 12) {
-  const world = WORLDS.find((w) => w.id === worldId) || WORLDS[0]
+export function buildBossQuestions(worldId, count) {
+  const worldIdx = WORLDS.findIndex((w) => w.id === worldId)
+  const world = worldIdx >= 0 ? WORLDS[worldIdx] : WORLDS[0]
+  const hard = worldIdx >= 1
   const lessons = world.nodes.filter((n) => n.lessonId).map((n) => getLesson(n.lessonId)).filter(Boolean)
   const all = lessons.flatMap((l) => l.kana)
-  return shuffle(all).slice(0, count).map(makeQuestion)
+  const n = count ?? bossStatsForWorld(worldId).questionCount
+  // Cycle the pool if the gauntlet is longer than the kana available, instead
+  // of ever repeating within one pass through the shuffled set.
+  const picked = []
+  while (picked.length < n) picked.push(...shuffle(all))
+  return picked.slice(0, n).map((k) => makeQuestion(k, hard))
 }
 
 // Build a free-practice set. Draws from the player's mastered kana (by char);
@@ -826,6 +882,46 @@ export function levelFromXp(xp) {
 
 export function xpIntoLevel(xp) {
   return xp % XP_PER_LEVEL
+}
+
+// ── Leveling up means something: a rank title + a petal (and sometimes heart)
+// payout every time you level up, bigger every 5th level. ──────────────────
+export const LEVEL_TITLES = [
+  { level: 1, title: 'Curious Kit' },
+  { level: 3, title: 'Wandering Fox' },
+  { level: 5, title: 'Trail Reader' },
+  { level: 8, title: 'Grove Scholar' },
+  { level: 12, title: 'Path Sage' },
+  { level: 16, title: 'Voice Keeper' },
+  { level: 20, title: 'Kana Ranger' },
+  { level: 25, title: 'Word Warden' },
+  { level: 30, title: 'Forest Sage' },
+  { level: 40, title: 'Hiragana Master' },
+  { level: 50, title: 'Legendary Kitsune' },
+]
+export function titleForLevel(level) {
+  let title = LEVEL_TITLES[0].title
+  for (const t of LEVEL_TITLES) if (level >= t.level) title = t.title
+  return title
+}
+export function nextTitleMilestone(level) {
+  return LEVEL_TITLES.find((t) => t.level > level) || null
+}
+
+export const LEVEL_UP_PETALS = 20
+export const LEVEL_UP_MILESTONE_PETALS = 100 // every 5th level
+
+// Sum the reward for every level crossed between prevLevel and nextLevel
+// (usually just one, but a big XP grant could cross several at once).
+export function sumLevelUpRewards(prevLevel, nextLevel) {
+  let petals = 0
+  let milestoneHeart = false
+  for (let lvl = prevLevel + 1; lvl <= nextLevel; lvl++) {
+    const isMilestone = lvl % 5 === 0
+    petals += isMilestone ? LEVEL_UP_MILESTONE_PETALS : LEVEL_UP_PETALS
+    if (isMilestone) milestoneHeart = true
+  }
+  return { leveledUp: nextLevel > prevLevel, newLevel: nextLevel, petals, milestoneHeart }
 }
 
 // Total kana taught across the forest (for "kana mastered" stats).
