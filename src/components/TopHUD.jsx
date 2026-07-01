@@ -52,7 +52,7 @@ export default function TopHUD({
         onClick={onOpenHearts}
         disabled={!onOpenHearts}
       >
-        <Icon name="heart" size={15} className="hud__chip-icon" />
+        <Icon name="heart" size={30} className="hud__chip-icon" />
         <span className="hud__chip-val">{hearts}</span>
         {onBuyHeart && (
           <span
@@ -64,7 +64,7 @@ export default function TopHUD({
               if (canBuyHeart) onBuyHeart()
             }}
           >
-            <Icon name="plus" size={9} />
+            <Icon name="plus" size={14} />
           </span>
         )}
       </motion.button>
@@ -80,22 +80,22 @@ export default function TopHUD({
         disabled={!onOpenStreak}
         whileTap={onOpenStreak ? { scale: 0.92 } : {}}
       >
-        <StreakFlame lit={streak > 0} size={16} className="hud__chip-icon" />
+        <StreakFlame lit={streak > 0} size={32} className="hud__chip-icon" />
         <span className="hud__chip-val">{streak}</span>
       </motion.button>
 
       <div className="hud__chip hud__chip--petals" title={CURRENCY.name}>
-        <Icon name="petal" size={16} className="hud__chip-icon" />
+        <Icon name="petal" size={32} className="hud__chip-icon" />
         <span className="hud__chip-val">{petals}</span>
       </div>
 
       {!compact && (
         <div className="hud__btns">
           <button className="hud__icon-btn" onClick={onOpenProfile} aria-label="Profile">
-            <Icon name="profile" size={18} />
+            <Icon name="profile" size={36} />
           </button>
           <button className="hud__icon-btn" onClick={onOpenSettings} aria-label="Settings">
-            <Icon name="settings" size={18} />
+            <Icon name="settings" size={36} />
           </button>
         </div>
       )}

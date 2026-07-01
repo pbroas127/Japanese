@@ -84,19 +84,19 @@ img { -webkit-user-drag: none; }
 .hud__xp-track { position: relative; height: 18px; background: #e7dcc8; border-radius: 999px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.12); }
 .hud__xp-fill { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--gold), #ffb43d); border-radius: 999px; }
 .hud__xp-label { position: absolute; inset: 0; display: grid; place-items: center; font-size: 11px; font-weight: 800; color: #6b4f1e; }
-.hud__chip { display: flex; align-items: center; gap: 3px; padding: 5px 9px; border-radius: 999px; font-weight: 900; font-size: 14px; background: #fff; box-shadow: var(--shadow-sm); flex: none; }
+.hud__chip { display: flex; align-items: center; gap: 4px; padding: 4px 10px 4px 6px; border-radius: 999px; font-weight: 900; font-size: 16px; background: #fff; box-shadow: var(--shadow-sm); flex: none; }
 .hud__chip-icon { line-height: 0; }
 .hud__chip--streak { color: var(--ink-soft); }
 .hud__chip--streak.is-hot { color: var(--fox-dark); }
 .hud__chip--streak.tier-glow { box-shadow: 0 0 0 2px var(--gold), var(--shadow-sm); }
 .hud__chip--streak.tier-legend { box-shadow: 0 0 12px var(--gold), 0 0 0 2px var(--gold); color: #b5641a; }
 .hud__chip--petals { color: #c4477f; }
-.hud__chip--hearts { position: relative; color: #e8556b; padding-right: 15px; }
+.hud__chip--hearts { position: relative; color: #e8556b; padding-right: 18px; }
 .hud__chip--hearts.is-empty { color: #b8afa2; }
-.hud__chip-plus { position: absolute; top: -5px; right: -5px; width: 16px; height: 16px; border-radius: 50%; background: var(--green-500); color: #fff; display: grid; place-items: center; box-shadow: 0 2px 0 #1c7a4f; }
+.hud__chip-plus { position: absolute; top: -7px; right: -7px; width: 22px; height: 22px; border-radius: 50%; background: var(--green-500); color: #fff; display: grid; place-items: center; box-shadow: 0 2px 0 #1c7a4f; }
 .hud__chip-plus.is-off { background: #cdc6b8; box-shadow: none; }
 .hud__btns { display: flex; gap: 4px; flex: none; }
-.hud__icon-btn { width: 34px; height: 34px; border-radius: 50%; border: none; background: #fff; box-shadow: var(--shadow-sm); cursor: pointer; display: grid; place-items: center; color: var(--green-700); }
+.hud__icon-btn { width: 46px; height: 46px; border-radius: 50%; border: none; background: #fff; box-shadow: var(--shadow-sm); cursor: pointer; display: grid; place-items: center; color: var(--green-700); }
 .hud__icon-btn:active { transform: scale(0.92); }
 
 /* ── Bottom nav ────────────────────────────────────────────────────────── */
