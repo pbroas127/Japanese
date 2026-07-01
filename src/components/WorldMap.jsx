@@ -81,7 +81,7 @@ export default function WorldMap({ getStatus, getProgress, onSelectNode, worldCo
                 <span>{world.name}</span>
               </div>
 
-              <div className="worldmap__scene" style={{ aspectRatio: `${world.art.w} / ${world.art.h}` }}>
+              <div className="worldmap__scene">
                 <img
                   className="worldmap__bg-img"
                   src={WORLD_ASSETS[world.id] || WORLD_ASSETS.forest}
@@ -114,6 +114,7 @@ export default function WorldMap({ getStatus, getProgress, onSelectNode, worldCo
                   <LessonNode
                     key={node.id}
                     node={node}
+                    worldId={world.id}
                     status={getStatus(node.id)}
                     stagesDone={getProgress?.(node.id).stagesDone ?? 0}
                     title={node.type === 'boss' ? world.bossName : getLesson(node.lessonId)?.title}

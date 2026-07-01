@@ -9,10 +9,11 @@ import StageDots from './StageDots'
 //  nodes get a consistent check badge; the current node glows (centered on the
 //  marker) and shows a small info panel directly above it.
 // ──────────────────────────────────────────────────────────────────────────
-export default function LessonNode({ node, status, title, stagesDone = 0, onSelect }) {
+export default function LessonNode({ node, worldId = 'forest', status, title, stagesDone = 0, onSelect }) {
   const isBoss = node.type === 'boss'
   const clickable = status === 'current'
-  const set = NODE_ASSETS[node.marker] || NODE_ASSETS.book
+  const worldSet = NODE_ASSETS[worldId] || NODE_ASSETS.forest
+  const set = worldSet[node.marker] || worldSet.book
   const fallback = NODE_FALLBACK[node.marker] || NODE_FALLBACK.book
   const src = status === 'locked' ? set.locked : set.unlocked
 
